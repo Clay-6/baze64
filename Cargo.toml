@@ -6,7 +6,6 @@ edition = "2021"
 
 [dependencies]
 bitreader = "0.3.6"
-simple-bits = "1.0.1"
 
 [dev-dependencies]
 pretty_assertions = "1.3.0"

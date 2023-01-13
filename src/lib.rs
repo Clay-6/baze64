@@ -1,5 +1,4 @@
 use bitreader::BitReader;
-use simple_bits::BitsExt;
 
 /// A string of Base64 encoded data
 #[derive(Debug, Clone)]
