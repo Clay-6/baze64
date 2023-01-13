@@ -36,6 +36,17 @@ impl Base64String {
         Self(encoded.iter().flatten().collect())
     }
 
+    /// Returns a URL-safe version of a [`Base64String`]
+    pub fn to_url_safe(&self) -> String {
+        self.0.replace('+', "-").replace('/', "_")
+    }
+
+    /// Constructs a [`Base64String`] from a URL-safe
+    /// Base64 encoded string
+    pub fn from_url_safe(b64: &str) -> Self {
+        Self(b64.replace('-', "+").replace('_', "/"))
+    }
+
     /// Encodes a set of 3 bytes
     fn encode_triplet(triple: &[u8; 3]) -> [char; 4] {
         let mut reader = BitReader::new(triple);
