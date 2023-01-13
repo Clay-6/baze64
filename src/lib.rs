@@ -1,4 +1,5 @@
 use bitreader::BitReader;
+use simple_bits::BitsExt;
 
 /// A string of Base64 encoded data
 #[derive(Debug, Clone)]
@@ -23,14 +24,18 @@ impl Base64String {
             encoded.push(Self::encode_triplet(&[chunk[0], chunk[1], chunk[2]]))
         }
 
-        let mut encoded = encoded.iter().flatten().cloned().collect::<Vec<_>>();
         let rem = chunks.remainder();
-        let mut reader = BitReader::new(rem);
-        while let Ok(group) = reader.read_u8(6) {
-            encoded.push(Self::ENCODE_MAP[group as usize])
-        }
+        encoded.push(match rem.len() {
+            1 => Self::encode_singlet(rem),
+            2 => Self::encode_doublet(rem),
+            _ => unreachable!(), // Mathematically impossible
+        });
+        // let mut reader = BitReader::new(rem);
+        // while let Ok(group) = reader.read_u8(6) {
+        //     encoded.push(Self::ENCODE_MAP[group as usize])
+        // }
 
-        Self(encoded.iter().collect())
+        Self(encoded.iter().flatten().collect())
     }
 
     /// Encodes a set of 3 bytes
@@ -48,6 +53,29 @@ impl Base64String {
             Self::ENCODE_MAP[third as usize],
             Self::ENCODE_MAP[fourth as usize],
         ]
+    }
+
+    /// Encodes a single byte & pads it
+    fn encode_singlet(rem: &[u8]) -> [char; 4] {
+        todo!()
+    }
+
+    /// Encodes a set of 2 bytes & pads it
+    fn encode_doublet(rem: &[u8]) -> [char; 4] {
+        let mut reader = BitReader::new(rem);
+        let six1 = reader.read_u8(6).unwrap();
+        let six2 = reader.read_u8(6).unwrap();
+        let nibble = reader.read_u8(4).unwrap();
+        let padded = nibble
+            .replace_bits(2..6, nibble.extract_bits(0..4))
+            .replace_bits(0..2, 0)
+            .replace_bits(7..8, 0);
+
+        let first = Self::ENCODE_MAP[six1 as usize];
+        let second = Self::ENCODE_MAP[six2 as usize];
+        let third = Self::ENCODE_MAP[padded as usize];
+
+        [first, second, third, Self::PADDING]
     }
 }
 
@@ -85,6 +113,15 @@ mod tests {
         let input = "everybody".chars().map(|c| c as u8);
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
         let expected = Base64String(String::from("ZXZlcnlib2R5"));
+
+        assert_eq!(b64, expected)
+    }
+
+    #[test]
+    fn encode_2_rem() {
+        let input = "event".chars().map(|c| c as u8);
+        let b64 = Base64String::encode(&input.collect::<Vec<_>>());
+        let expected = Base64String(String::from("ZXZlbnQ="));
 
         assert_eq!(b64, expected)
     }
