@@ -1,0 +1,7 @@
+[package]
+name = "baze64"
+description = "A base64 encoder & decoder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
