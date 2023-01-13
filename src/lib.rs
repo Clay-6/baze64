@@ -13,9 +13,25 @@ impl Base64String {
     ];
 
     pub fn encode(bytes: &[u8]) -> Self {
-        todo!()
+        let mut chunks = bytes.chunks_exact(3);
+        let mut encoded = vec![];
+
+        #[allow(clippy::while_let_on_iterator)] // Ownership shenanigans necessitate this
+        while let Some(chunk) = chunks.next() {
+            encoded.push(Self::encode_triplet(&[chunk[0], chunk[1], chunk[2]]))
+        }
+
+        let mut encoded = encoded.iter().flatten().cloned().collect::<Vec<_>>();
+        let rem = chunks.remainder();
+        let mut reader = BitReader::new(rem);
+        while let Ok(group) = reader.read_u8(6) {
+            encoded.push(Self::ENCODE_MAP[group as usize])
+        }
+
+        Self(encoded.iter().collect())
     }
 
+    /// Encodes a set of 3
     fn encode_triplet(triple: &[u8; 3]) -> [char; 4] {
         let mut reader = BitReader::new(triple);
         // These unwraps are fine because 8*3 == 6*4
@@ -60,5 +76,14 @@ mod tests {
             Base64String::encode_triplet(&[triplet[0] as u8, triplet[1] as u8, triplet[2] as u8]);
 
         assert_eq!(encoded, expected_encoded);
+    }
+
+    #[test]
+    fn encode_long() {
+        let input = "everybody".chars().map(|c| c as u8);
+        let b64 = Base64String::encode(&input.collect::<Vec<_>>());
+        let expected = Base64String(String::from("ZXZlcnlib2R5"));
+
+        assert_eq!(b64, expected)
     }
 }
