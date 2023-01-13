@@ -56,13 +56,14 @@ impl Base64String {
         let mut reader = BitReader::new(rem);
         let six = reader.read_u8(6).unwrap();
         let half_nib = reader.read_u8(2).unwrap();
+        let (half_nib, _) = half_nib.overflowing_shl(4);
 
-        let padded = half_nib
-            .replace_bits(4..5, half_nib.extract_bits(0..1))
-            .replace_bits(0..3, 0);
+        // let padded = half_nib
+        //     .replace_bits(4..5, half_nib.extract_bits(0..1))
+        //     .replace_bits(0..3, 0);
 
         let first = Self::ENCODE_MAP[six as usize];
-        let second = Self::ENCODE_MAP[padded as usize];
+        let second = Self::ENCODE_MAP[half_nib as usize];
 
         [first, second, Self::PADDING, Self::PADDING]
     }
@@ -73,14 +74,11 @@ impl Base64String {
         let six1 = reader.read_u8(6).unwrap();
         let six2 = reader.read_u8(6).unwrap();
         let nibble = reader.read_u8(4).unwrap();
-        let padded = nibble
-            .replace_bits(2..6, nibble.extract_bits(0..4))
-            .replace_bits(0..2, 0)
-            .replace_bits(7..8, 0);
+        let (nibble, _) = nibble.overflowing_shl(2);
 
         let first = Self::ENCODE_MAP[six1 as usize];
         let second = Self::ENCODE_MAP[six2 as usize];
-        let third = Self::ENCODE_MAP[padded as usize];
+        let third = Self::ENCODE_MAP[nibble as usize];
 
         [first, second, third, Self::PADDING]
     }
