@@ -25,16 +25,12 @@ impl Base64String {
         }
 
         let rem = chunks.remainder();
-        encoded.push(match rem.len() {
-            1 => Self::encode_singlet(rem),
-            2 => Self::encode_doublet(rem),
-            _ => unreachable!(), // Mathematically impossible
-        });
-        // let mut reader = BitReader::new(rem);
-        // while let Ok(group) = reader.read_u8(6) {
-        //     encoded.push(Self::ENCODE_MAP[group as usize])
-        // }
-
+        match rem.len() {
+            0 => { /* Do nothing */ }
+            1 => encoded.push(Self::encode_singlet(rem)),
+            2 => encoded.push(Self::encode_doublet(rem)),
+            _ => unreachable!("{}", rem.len()), // Mathematically impossible
+        }
         Self(encoded.iter().flatten().collect())
     }
 
@@ -57,7 +53,18 @@ impl Base64String {
 
     /// Encodes a single byte & pads it
     fn encode_singlet(rem: &[u8]) -> [char; 4] {
-        todo!()
+        let mut reader = BitReader::new(rem);
+        let six = reader.read_u8(6).unwrap();
+        let half_nib = reader.read_u8(2).unwrap();
+
+        let padded = half_nib
+            .replace_bits(4..5, half_nib.extract_bits(0..1))
+            .replace_bits(0..3, 0);
+
+        let first = Self::ENCODE_MAP[six as usize];
+        let second = Self::ENCODE_MAP[padded as usize];
+
+        [first, second, Self::PADDING, Self::PADDING]
     }
 
     /// Encodes a set of 2 bytes & pads it
@@ -122,6 +129,15 @@ mod tests {
         let input = "event".chars().map(|c| c as u8);
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
         let expected = Base64String(String::from("ZXZlbnQ="));
+
+        assert_eq!(b64, expected)
+    }
+
+    #[test]
+    fn encode_1_rem() {
+        let input = "even".chars().map(|c| c as u8);
+        let b64 = Base64String::encode(&input.collect::<Vec<_>>());
+        let expected = Base64String(String::from("ZXZlbg=="));
 
         assert_eq!(b64, expected)
     }
