@@ -1,5 +1,6 @@
 use bitreader::BitReader;
 
+/// A string of Base64 encoded data
 #[derive(Debug, Clone)]
 pub struct Base64String(String);
 
@@ -12,6 +13,7 @@ impl Base64String {
         '2', '3', '4', '5', '6', '7', '8', '9', '+', '/',
     ];
 
+    /// Encodes a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8]) -> Self {
         let mut chunks = bytes.chunks_exact(3);
         let mut encoded = vec![];
@@ -31,7 +33,7 @@ impl Base64String {
         Self(encoded.iter().collect())
     }
 
-    /// Encodes a set of 3
+    /// Encodes a set of 3 bytes
     fn encode_triplet(triple: &[u8; 3]) -> [char; 4] {
         let mut reader = BitReader::new(triple);
         // These unwraps are fine because 8*3 == 6*4
