@@ -22,14 +22,14 @@ where
 
         #[allow(clippy::while_let_on_iterator)] // Ownership shenanigans necessitate this
         while let Some(chunk) = chunks.next() {
-            encoded.push(Self::encode_triplet(&[chunk[0], chunk[1], chunk[2]]))
+            encoded.push(Self::encode_triplet([chunk[0], chunk[1], chunk[2]]))
         }
 
         let rem = chunks.remainder();
         match rem.len() {
             0 => { /* Do nothing */ }
-            1 => encoded.push(Self::encode_singlet(rem)),
-            2 => encoded.push(Self::encode_doublet(rem)),
+            1 => encoded.push(Self::encode_singlet([rem[0]])),
+            2 => encoded.push(Self::encode_doublet([rem[0], rem[1]])),
             _ => unreachable!("{}", rem.len()), // Mathematically impossible
         }
         Self {
@@ -39,8 +39,8 @@ where
     }
 
     /// Encodes a set of 3 bytes
-    fn encode_triplet(triple: &[u8; 3]) -> [char; 4] {
-        let mut reader = BitReader::new(triple);
+    fn encode_triplet(triple: [u8; 3]) -> [char; 4] {
+        let mut reader = BitReader::new(&triple);
         // These unwraps are fine because 8*3 == 6*4
         let first = reader.read_u8(6).unwrap();
         let second = reader.read_u8(6).unwrap();
@@ -56,8 +56,8 @@ where
     }
 
     /// Encodes a single byte & pads it
-    fn encode_singlet(rem: &[u8]) -> [char; 4] {
-        let mut reader = BitReader::new(rem);
+    fn encode_singlet(rem: [u8; 1]) -> [char; 4] {
+        let mut reader = BitReader::new(&rem);
         let six = reader.read_u8(6).unwrap();
         let half_nib = reader.read_u8(2).unwrap();
         let (half_nib, _) = half_nib.overflowing_shl(4);
@@ -73,8 +73,8 @@ where
     }
 
     /// Encodes a set of 2 bytes & pads it
-    fn encode_doublet(rem: &[u8]) -> [char; 4] {
-        let mut reader = BitReader::new(rem);
+    fn encode_doublet(rem: [u8; 2]) -> [char; 4] {
+        let mut reader = BitReader::new(&rem);
         let six1 = reader.read_u8(6).unwrap();
         let six2 = reader.read_u8(6).unwrap();
         let nibble = reader.read_u8(4).unwrap();
@@ -120,7 +120,7 @@ mod tests {
         let triplet = ['A', 'B', 'C'];
         let expected_encoded = ['Q', 'U', 'J', 'D'];
 
-        let encoded = Base64String::<Standard>::encode_triplet(&[
+        let encoded = Base64String::<Standard>::encode_triplet([
             triplet[0] as u8,
             triplet[1] as u8,
             triplet[2] as u8,
