@@ -1,13 +1,22 @@
 /// Trait for a base64 alphabet that can be used
 /// to encode & decode a [`Base64String`](crate::Base64String)
 pub trait Alphabet {
+    /// Array which, when indexed with a given byte,
+    /// returns the corresponding base64 character
     const ENCODE_MAP: [char; 64];
+    /// An array which, when indexed by a base64 character's
+    /// byte representation, returns the corresponding
+    /// decoded byte
     const DECODE_MAP: [u8; 128];
+    /// The character used to pad an encoded string
     const PADDING: char;
 
+    /// Returns the base64 character corresponding to a set of 6
+    /// bits
     fn encode_bits(bits: u8) -> char {
         Self::ENCODE_MAP[bits as usize]
     }
+    /// Decodes a base64 character into it's decoded bytes
     fn decode_char(c: char) -> u8 {
         if c == Self::PADDING {
             0
