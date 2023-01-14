@@ -13,8 +13,8 @@ pub struct Args {
 pub enum Command {
     /// Encode something into Base64
     Encode {
-        /// Encode UTF-8 text
-        text: Option<String>,
+        /// Encode a UTF-8 string
+        string: Option<String>,
         /// Encode a file
         #[clap(short, long)]
         file: Option<PathBuf>,
@@ -22,7 +22,7 @@ pub enum Command {
     /// Decode a Base64 string
     Decode {
         /// The Base64 string to decode
-        text: String,
+        base64: String,
         /// The output file for the decoded data
         #[clap(short, long)]
         output: Option<PathBuf>,
