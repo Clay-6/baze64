@@ -105,10 +105,10 @@ where
         let fourth = reader.read_u8(6).unwrap();
 
         [
-            A::ENCODE_MAP[first as usize],
-            A::ENCODE_MAP[second as usize],
-            A::ENCODE_MAP[third as usize],
-            A::ENCODE_MAP[fourth as usize],
+            A::encode_bits(first),
+            A::encode_bits(second),
+            A::encode_bits(third),
+            A::encode_bits(fourth),
         ]
     }
 
@@ -123,8 +123,8 @@ where
         //     .replace_bits(4..5, half_nib.extract_bits(0..1))
         //     .replace_bits(0..3, 0);
 
-        let first = A::ENCODE_MAP[six as usize];
-        let second = A::ENCODE_MAP[half_nib as usize];
+        let first = A::encode_bits(six);
+        let second = A::encode_bits(half_nib);
 
         [first, second, A::PADDING, A::PADDING]
     }
@@ -137,9 +137,9 @@ where
         let nibble = reader.read_u8(4).unwrap();
         let (nibble, _) = nibble.overflowing_shl(2);
 
-        let first = A::ENCODE_MAP[six1 as usize];
-        let second = A::ENCODE_MAP[six2 as usize];
-        let third = A::ENCODE_MAP[nibble as usize];
+        let first = A::encode_bits(six1);
+        let second = A::encode_bits(six2);
+        let third = A::encode_bits(nibble);
 
         [first, second, third, A::PADDING]
     }
