@@ -1,15 +1,13 @@
 [package]
 name = "baze64"
 description = "A base64 encoder & decoder"
+authors = ["Clay66"]
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "baze64"
-path = "src/bin/main.rs"
-
 [dependencies]
 bitreader = "0.3.6"
+clap = { version = "4.1.1", features = ["derive"] }
 
 [dev-dependencies]
 pretty_assertions = "1.3.0"
