@@ -1,21 +1,20 @@
-use std::collections::HashMap;
+use std::marker::PhantomData;
 
 use bitreader::BitReader;
-use lazy_static::lazy_static;
+
+use crate::alphabet::Alphabet;
 
 /// A string of Base64 encoded data
 #[derive(Debug, Clone)]
-pub struct Base64String(String);
+pub struct Base64String<A> {
+    content: String,
+    _marker: PhantomData<A>,
+}
 
-impl Base64String {
-    pub const PADDING: char = '=';
-    const ENCODE_MAP: [char; 64] = [
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1',
-        '2', '3', '4', '5', '6', '7', '8', '9', '+', '/',
-    ];
-
+impl<A> Base64String<A>
+where
+    A: Alphabet,
+{
     /// Encodes a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8]) -> Self {
         let mut chunks = bytes.chunks_exact(3);
@@ -33,18 +32,10 @@ impl Base64String {
             2 => encoded.push(Self::encode_doublet(rem)),
             _ => unreachable!("{}", rem.len()), // Mathematically impossible
         }
-        Self(encoded.iter().flatten().collect())
-    }
-
-    /// Returns a URL-safe version of a [`Base64String`]
-    pub fn to_url_safe(&self) -> String {
-        self.0.replace('+', "-").replace('/', "_")
-    }
-
-    /// Constructs a [`Base64String`] from a URL-safe
-    /// Base64 encoded string
-    pub fn from_url_safe(b64: &str) -> Self {
-        Self(b64.replace('-', "+").replace('_', "/"))
+        Self {
+            content: encoded.iter().flatten().collect(),
+            _marker: PhantomData,
+        }
     }
 
     /// Encodes a set of 3 bytes
@@ -57,10 +48,10 @@ impl Base64String {
         let fourth = reader.read_u8(6).unwrap();
 
         [
-            Self::ENCODE_MAP[first as usize],
-            Self::ENCODE_MAP[second as usize],
-            Self::ENCODE_MAP[third as usize],
-            Self::ENCODE_MAP[fourth as usize],
+            A::ENCODE_MAP[first as usize],
+            A::ENCODE_MAP[second as usize],
+            A::ENCODE_MAP[third as usize],
+            A::ENCODE_MAP[fourth as usize],
         ]
     }
 
@@ -75,10 +66,10 @@ impl Base64String {
         //     .replace_bits(4..5, half_nib.extract_bits(0..1))
         //     .replace_bits(0..3, 0);
 
-        let first = Self::ENCODE_MAP[six as usize];
-        let second = Self::ENCODE_MAP[half_nib as usize];
+        let first = A::ENCODE_MAP[six as usize];
+        let second = A::ENCODE_MAP[half_nib as usize];
 
-        [first, second, Self::PADDING, Self::PADDING]
+        [first, second, A::PADDING, A::PADDING]
     }
 
     /// Encodes a set of 2 bytes & pads it
@@ -89,98 +80,38 @@ impl Base64String {
         let nibble = reader.read_u8(4).unwrap();
         let (nibble, _) = nibble.overflowing_shl(2);
 
-        let first = Self::ENCODE_MAP[six1 as usize];
-        let second = Self::ENCODE_MAP[six2 as usize];
-        let third = Self::ENCODE_MAP[nibble as usize];
+        let first = A::ENCODE_MAP[six1 as usize];
+        let second = A::ENCODE_MAP[six2 as usize];
+        let third = A::ENCODE_MAP[nibble as usize];
 
-        [first, second, third, Self::PADDING]
+        [first, second, third, A::PADDING]
     }
 }
 
-impl PartialEq for Base64String {
+impl<A> PartialEq for Base64String<A> {
     fn eq(&self, other: &Self) -> bool {
-        self.0.chars().filter(|&c| c != '=').collect::<String>()
-            == other.0.chars().filter(|&c| c != '=').collect::<String>()
+        self.content
+            .chars()
+            .filter(|&c| c != '=')
+            .collect::<String>()
+            == other
+                .content
+                .chars()
+                .filter(|&c| c != '=')
+                .collect::<String>()
     }
 }
 
-impl core::fmt::Display for Base64String {
+impl<A> core::fmt::Display for Base64String<A> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self.content)
     }
-}
-
-lazy_static! {
-    static ref DECODE_MAP: HashMap<char, usize> = HashMap::from([
-        ('A', 0),
-        ('B', 1),
-        ('C', 2),
-        ('D', 3),
-        ('E', 4),
-        ('F', 5),
-        ('G', 6),
-        ('H', 7),
-        ('I', 8),
-        ('J', 9),
-        ('K', 10),
-        ('L', 11),
-        ('M', 12),
-        ('N', 13),
-        ('O', 14),
-        ('P', 15),
-        ('Q', 16),
-        ('R', 17),
-        ('S', 18),
-        ('T', 19),
-        ('U', 20),
-        ('V', 21),
-        ('W', 22),
-        ('X', 23),
-        ('Y', 24),
-        ('Z', 25),
-        ('a', 26),
-        ('b', 27),
-        ('c', 28),
-        ('d', 29),
-        ('e', 30),
-        ('f', 31),
-        ('g', 32),
-        ('h', 33),
-        ('i', 34),
-        ('j', 35),
-        ('k', 36),
-        ('l', 37),
-        ('m', 38),
-        ('n', 39),
-        ('o', 40),
-        ('p', 41),
-        ('q', 42),
-        ('r', 43),
-        ('s', 44),
-        ('t', 45),
-        ('u', 46),
-        ('v', 47),
-        ('w', 48),
-        ('x', 49),
-        ('y', 50),
-        ('z', 51),
-        ('0', 52),
-        ('1', 53),
-        ('2', 54),
-        ('3', 55),
-        ('4', 56),
-        ('5', 57),
-        ('6', 58),
-        ('7', 59),
-        ('8', 60),
-        ('9', 61),
-        ('+', 62),
-        ('/', 63),
-    ]);
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::alphabet::Standard;
+
     use super::*;
     use pretty_assertions::assert_eq;
 
@@ -189,8 +120,11 @@ mod tests {
         let triplet = ['A', 'B', 'C'];
         let expected_encoded = ['Q', 'U', 'J', 'D'];
 
-        let encoded =
-            Base64String::encode_triplet(&[triplet[0] as u8, triplet[1] as u8, triplet[2] as u8]);
+        let encoded = Base64String::<Standard>::encode_triplet(&[
+            triplet[0] as u8,
+            triplet[1] as u8,
+            triplet[2] as u8,
+        ]);
 
         assert_eq!(encoded, expected_encoded);
     }
@@ -199,7 +133,10 @@ mod tests {
     fn encode_long() {
         let input = "everybody".chars().map(|c| c as u8);
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
-        let expected = Base64String(String::from("ZXZlcnlib2R5"));
+        let expected = Base64String {
+            content: String::from("ZXZlcnlib2R5"),
+            _marker: PhantomData::<Standard>,
+        };
 
         assert_eq!(b64, expected)
     }
@@ -208,7 +145,10 @@ mod tests {
     fn encode_2_rem() {
         let input = "event".chars().map(|c| c as u8);
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
-        let expected = Base64String(String::from("ZXZlbnQ="));
+        let expected = Base64String {
+            content: String::from("ZXZlbnQ="),
+            _marker: PhantomData::<Standard>,
+        };
 
         assert_eq!(b64, expected)
     }
@@ -217,7 +157,10 @@ mod tests {
     fn encode_1_rem() {
         let input = "even".chars().map(|c| c as u8);
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
-        let expected = Base64String(String::from("ZXZlbg=="));
+        let expected = Base64String {
+            content: String::from("ZXZlbg=="),
+            _marker: PhantomData::<Standard>,
+        };
 
         assert_eq!(b64, expected)
     }
