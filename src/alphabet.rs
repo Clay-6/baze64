@@ -1,3 +1,5 @@
+/// Trait for a base64 alphabet that can be used
+/// to encode & decode a [`Base64String`](crate::Base64String)
 pub trait Alphabet {
     const ENCODE_MAP: [char; 64];
     const DECODE_MAP: [u8; 128];
@@ -15,9 +17,13 @@ pub trait Alphabet {
     }
 }
 
+/// The standard base64 alphabet as defined in
+/// RFC 4648
 #[derive(Debug, Clone, Copy)]
 pub struct Standard;
 
+/// The URL safe base64 alphabet as defined in
+/// RFC 4648
 #[derive(Debug, Clone, Copy)]
 pub struct UrlSafe;
 

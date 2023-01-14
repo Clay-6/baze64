@@ -63,6 +63,7 @@ where
         decoded
     }
 
+    /// Decode a set of 4 bytes
     fn decode_quad([a, b, c, d]: [char; 4]) -> [u8; 3] {
         let concat_bytes = ((A::decode_char(a) as u32) << 18)
             | ((A::decode_char(b) as u32) << 12)
