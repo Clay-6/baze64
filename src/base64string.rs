@@ -63,6 +63,11 @@ where
         decoded
     }
 
+    /// Returns the encoded string with the padding removed
+    pub fn without_padding(&self) -> String {
+        self.content.chars().filter(|&c| c != A::PADDING).collect()
+    }
+
     /// Decode a set of 4 bytes
     fn decode_quad([a, b, c, d]: [char; 4]) -> [u8; 3] {
         let concat_bytes = ((A::decode_char(a) as u32) << 18)
