@@ -126,23 +126,21 @@ where
     }
 }
 
-impl<A> PartialEq for Base64String<A> {
-    fn eq(&self, other: &Self) -> bool {
-        self.content
-            .chars()
-            .filter(|&c| c != '=')
-            .collect::<String>()
-            == other
-                .content
-                .chars()
-                .filter(|&c| c != '=')
-                .collect::<String>()
+impl<A> core::fmt::Display for Base64String<A>
+where
+    A: Alphabet,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.content)
     }
 }
 
-impl<A> core::fmt::Display for Base64String<A> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.content)
+impl<A> PartialEq for Base64String<A>
+where
+    A: Alphabet,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.content == other.content
     }
 }
 
