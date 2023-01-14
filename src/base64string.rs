@@ -8,7 +8,7 @@ use crate::alphabet::Alphabet;
 #[derive(Debug, Clone)]
 pub struct Base64String<A> {
     content: String,
-    _marker: PhantomData<A>,
+    _alphabet: PhantomData<A>,
 }
 
 impl<A> Base64String<A>
@@ -34,8 +34,45 @@ where
         }
         Self {
             content: encoded.iter().flatten().collect(),
-            _marker: PhantomData,
+            _alphabet: PhantomData,
         }
+    }
+
+    /// Decode the contents of `self` into a byte sequence
+    pub fn decode(&self) -> Vec<u8> {
+        let mut decoded = vec![];
+        let tmp = self.content.chars().collect::<Vec<_>>();
+        let segments = tmp.chunks_exact(4);
+
+        for seg in segments {
+            if seg.ends_with(&[A::PADDING, A::PADDING]) {
+                let tri = Self::decode_quad([seg[0], seg[1], 0 as char, 0 as char]);
+                decoded.push(tri[0]);
+            } else if seg.ends_with(&[A::PADDING]) {
+                let tri = Self::decode_quad([seg[0], seg[1], seg[2], 0 as char]);
+                decoded.push(tri[0]);
+                decoded.push(tri[1]);
+            } else {
+                let tri = Self::decode_quad([seg[0], seg[1], seg[2], seg[3]]);
+                for byte in tri {
+                    decoded.push(byte)
+                }
+            }
+        }
+
+        decoded
+    }
+
+    fn decode_quad([a, b, c, d]: [char; 4]) -> [u8; 3] {
+        let concat_bytes = ((A::decode_char(a) as u32) << 18)
+            | ((A::decode_char(b) as u32) << 12)
+            | ((A::decode_char(c) as u32) << 6)
+            | A::decode_char(d) as u32;
+        [
+            ((concat_bytes >> 16) & 0b1111_1111) as u8,
+            ((concat_bytes >> 8) & 0b1111_1111) as u8,
+            (concat_bytes & 0b1111_1111) as u8,
+        ]
     }
 
     /// Encodes a set of 3 bytes
@@ -135,7 +172,7 @@ mod tests {
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlcnlib2R5"),
-            _marker: PhantomData::<Standard>,
+            _alphabet: PhantomData::<Standard>,
         };
 
         assert_eq!(b64, expected)
@@ -147,7 +184,7 @@ mod tests {
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlbnQ="),
-            _marker: PhantomData::<Standard>,
+            _alphabet: PhantomData::<Standard>,
         };
 
         assert_eq!(b64, expected)
@@ -159,9 +196,45 @@ mod tests {
         let b64 = Base64String::encode(&input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlbg=="),
-            _marker: PhantomData::<Standard>,
+            _alphabet: PhantomData::<Standard>,
         };
 
         assert_eq!(b64, expected)
+    }
+
+    #[test]
+    fn decode_no_pad() {
+        let src = Base64String {
+            content: String::from("ZXZlcnlib2R5"),
+            _alphabet: PhantomData::<Standard>,
+        };
+        let expected = b"everybody".to_vec();
+        let decoded = src.decode();
+
+        assert_eq!(decoded, expected)
+    }
+
+    #[test]
+    fn decode_one_pad() {
+        let src = Base64String {
+            content: String::from("ZXZlbnQ="),
+            _alphabet: PhantomData::<Standard>,
+        };
+        let expected = b"event".to_vec();
+        let decoded = src.decode();
+
+        assert_eq!(decoded, expected)
+    }
+
+    #[test]
+    fn decode_two_pad() {
+        let src = Base64String {
+            content: String::from("ZXZlbg=="),
+            _alphabet: PhantomData::<Standard>,
+        };
+        let expected = b"even".to_vec();
+        let decoded = src.decode();
+
+        assert_eq!(decoded, expected)
     }
 }
