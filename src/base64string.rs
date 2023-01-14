@@ -63,6 +63,20 @@ where
         decoded
     }
 
+    /// Contruct a [`Base64String`] from already encoded
+    /// Base64
+    pub fn from_encoded(b64: &str) -> Self {
+        let mut content = b64.to_string();
+        while content.len() % 4 != 0 {
+            content.push(A::PADDING)
+        }
+
+        Self {
+            content,
+            _alphabet: PhantomData::<A>,
+        }
+    }
+
     /// Returns the encoded string with the padding removed
     pub fn without_padding(&self) -> String {
         self.content.chars().filter(|&c| c != A::PADDING).collect()
