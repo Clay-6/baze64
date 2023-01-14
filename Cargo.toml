@@ -1,9 +1,11 @@
 [package]
 name = "baze64"
-description = "A base64 encoder & decoder"
+description = "Encode & decode base64 from & to arbitrary byte sequences"
 authors = ["Clay66"]
 version = "0.1.0"
 edition = "2021"
+readme = "README.md"
+repository = "https://github.com/Clay-6/baze64"
 
 [dependencies]
 bitreader = "0.3.6"
