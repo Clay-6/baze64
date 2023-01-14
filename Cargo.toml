@@ -4,6 +4,10 @@ description = "A base64 encoder & decoder"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "baze64"
+path = "src/bin/main.rs"
+
 [dependencies]
 bitreader = "0.3.6"
 
