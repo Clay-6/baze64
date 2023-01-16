@@ -15,7 +15,7 @@ impl<A> Base64String<A>
 where
     A: Alphabet,
 {
-    /// Encodes a sequence of bytes into a [`Base64String`]
+    /// Encode a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8]) -> Self {
         let mut chunks = bytes.chunks_exact(3);
         let mut encoded = vec![];
@@ -80,6 +80,17 @@ where
     /// Returns the encoded string with the padding removed
     pub fn without_padding(&self) -> String {
         self.content.chars().filter(|&c| c != A::PADDING).collect()
+    }
+
+    /// Returns a new [`Base64String`] with the specified
+    /// alphabet `B`
+    pub fn change_alphabet<B>(self) -> Base64String<B>
+    where
+        B: Alphabet,
+    {
+        let inner = self.decode();
+
+        Base64String::<B>::encode(&inner)
     }
 
     /// Decode a set of 4 bytes
