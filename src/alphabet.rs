@@ -71,6 +71,10 @@ impl Alphabet for UrlSafe {
     fn decode_char(c: char) -> u8 {
         if c == Self::PADDING {
             0
+        } else if c == '-' {
+            Self::DECODE_MAP[b'+' as usize]
+        } else if c == '_' {
+            Self::DECODE_MAP[b'/' as usize]
         } else {
             Self::DECODE_MAP[c as u8 as usize]
         }
