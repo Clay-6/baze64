@@ -12,6 +12,7 @@ license = "MIT"
 bitreader = "0.3.6"
 clap = { version = "4.1.1", features = ["derive"] }
 color-eyre = "0.6.2"
+thiserror = "1.0.38"
 
 [dev-dependencies]
 pretty_assertions = "1.3.0"

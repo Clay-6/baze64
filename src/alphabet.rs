@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 /// Trait for a base64 alphabet that can be used
 /// to encode & decode a [`Base64String`](crate::Base64String)
 pub trait Alphabet {
@@ -6,9 +8,17 @@ pub trait Alphabet {
 
     /// Returns the base64 character corresponding to a set of 6
     /// bits
-    fn encode_bits(bits: u8) -> char;
+    fn encode_bits(bits: u8) -> Result<char, AlphabetError>;
     /// Decodes a base64 character into it's decoded bytes
-    fn decode_char(c: char) -> u8;
+    fn decode_char(c: char) -> Result<u8, AlphabetError>;
+}
+
+#[derive(Debug, Error)]
+pub enum AlphabetError {
+    #[error("Value {0} is outsite the 6-bit integer range")]
+    BitsOOB(u8),
+    #[error("Character {0} is not part of the alphabet")]
+    InvalidChar(char),
 }
 
 /// The standard base64 alphabet as defined in
@@ -64,19 +74,27 @@ impl UrlSafe {
 impl Alphabet for UrlSafe {
     const PADDING: char = '=';
 
-    fn encode_bits(bits: u8) -> char {
-        Self::ENCODE_MAP[bits as usize]
+    fn encode_bits(bits: u8) -> Result<char, AlphabetError> {
+        if bits > 63 {
+            Err(AlphabetError::BitsOOB(bits))
+        } else {
+            Ok(Self::ENCODE_MAP[bits as usize])
+        }
     }
 
-    fn decode_char(c: char) -> u8 {
-        if c == Self::PADDING {
-            0
-        } else if c == '-' {
-            Self::DECODE_MAP[b'+' as usize]
-        } else if c == '_' {
-            Self::DECODE_MAP[b'/' as usize]
+    fn decode_char(c: char) -> Result<u8, AlphabetError> {
+        if !Self::ENCODE_MAP.contains(&c) {
+            Err(AlphabetError::InvalidChar(c))
         } else {
-            Self::DECODE_MAP[c as u8 as usize]
+            if c == Self::PADDING {
+                Ok(0)
+            } else if c == '-' {
+                Ok(Self::DECODE_MAP[b'+' as usize])
+            } else if c == '_' {
+                Ok(Self::DECODE_MAP[b'/' as usize])
+            } else {
+                Ok(Self::DECODE_MAP[c as u8 as usize])
+            }
         }
     }
 }
@@ -84,15 +102,23 @@ impl Alphabet for UrlSafe {
 impl Alphabet for Standard {
     const PADDING: char = '=';
 
-    fn encode_bits(bits: u8) -> char {
-        Self::ENCODE_MAP[bits as usize]
+    fn encode_bits(bits: u8) -> Result<char, AlphabetError> {
+        if bits > 63 {
+            Err(AlphabetError::BitsOOB(bits))
+        } else {
+            Ok(Self::ENCODE_MAP[bits as usize])
+        }
     }
 
-    fn decode_char(c: char) -> u8 {
-        if c == Self::PADDING {
-            0
+    fn decode_char(c: char) -> Result<u8, AlphabetError> {
+        if !Self::ENCODE_MAP.contains(&c) {
+            Err(AlphabetError::InvalidChar(c))
         } else {
-            Self::DECODE_MAP[c as u8 as usize]
+            if c == Self::PADDING {
+                Ok(0)
+            } else {
+                Ok(Self::DECODE_MAP[c as u8 as usize])
+            }
         }
     }
 }
