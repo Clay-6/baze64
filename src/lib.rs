@@ -36,3 +36,12 @@ pub mod alphabet;
 mod base64string;
 
 pub use base64string::Base64String;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum B64Error {
+    #[error("Value {0} is outsite the 6-bit integer range")]
+    BitsOOB(u8),
+    #[error("Character {0} is not part of the alphabet")]
+    InvalidChar(char),
+}

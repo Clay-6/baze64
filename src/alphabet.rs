@@ -1,4 +1,4 @@
-use thiserror::Error;
+use crate::B64Error;
 
 /// Trait for a base64 alphabet that can be used
 /// to encode & decode a [`Base64String`](crate::Base64String)
@@ -8,17 +8,9 @@ pub trait Alphabet {
 
     /// Returns the base64 character corresponding to a set of 6
     /// bits
-    fn encode_bits(bits: u8) -> Result<char, AlphabetError>;
+    fn encode_bits(bits: u8) -> Result<char, B64Error>;
     /// Decodes a base64 character into it's decoded bytes
-    fn decode_char(c: char) -> Result<u8, AlphabetError>;
-}
-
-#[derive(Debug, Error)]
-pub enum AlphabetError {
-    #[error("Value {0} is outsite the 6-bit integer range")]
-    BitsOOB(u8),
-    #[error("Character {0} is not part of the alphabet")]
-    InvalidChar(char),
+    fn decode_char(c: char) -> Result<u8, B64Error>;
 }
 
 /// The standard base64 alphabet as defined in
@@ -74,17 +66,17 @@ impl UrlSafe {
 impl Alphabet for UrlSafe {
     const PADDING: char = '=';
 
-    fn encode_bits(bits: u8) -> Result<char, AlphabetError> {
+    fn encode_bits(bits: u8) -> Result<char, B64Error> {
         if bits > 63 {
-            Err(AlphabetError::BitsOOB(bits))
+            Err(B64Error::BitsOOB(bits))
         } else {
             Ok(Self::ENCODE_MAP[bits as usize])
         }
     }
 
-    fn decode_char(c: char) -> Result<u8, AlphabetError> {
+    fn decode_char(c: char) -> Result<u8, B64Error> {
         if !Self::ENCODE_MAP.contains(&c) {
-            Err(AlphabetError::InvalidChar(c))
+            Err(B64Error::InvalidChar(c))
         } else {
             if c == Self::PADDING {
                 Ok(0)
@@ -102,17 +94,17 @@ impl Alphabet for UrlSafe {
 impl Alphabet for Standard {
     const PADDING: char = '=';
 
-    fn encode_bits(bits: u8) -> Result<char, AlphabetError> {
+    fn encode_bits(bits: u8) -> Result<char, B64Error> {
         if bits > 63 {
-            Err(AlphabetError::BitsOOB(bits))
+            Err(B64Error::BitsOOB(bits))
         } else {
             Ok(Self::ENCODE_MAP[bits as usize])
         }
     }
 
-    fn decode_char(c: char) -> Result<u8, AlphabetError> {
+    fn decode_char(c: char) -> Result<u8, B64Error> {
         if !Self::ENCODE_MAP.contains(&c) {
-            Err(AlphabetError::InvalidChar(c))
+            Err(B64Error::InvalidChar(c))
         } else {
             if c == Self::PADDING {
                 Ok(0)
