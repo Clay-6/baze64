@@ -43,11 +43,11 @@ fn baze64() -> Result<()> {
             };
             match alphabet {
                 cli::Alphabet::Standard => {
-                    let b64 = Base64String::<Standard>::encode(&data);
+                    let b64 = Base64String::<Standard>::encode(&data)?;
                     println!("{}", b64);
                 }
                 cli::Alphabet::UrlSafe => {
-                    let b64 = Base64String::<UrlSafe>::encode(&data);
+                    let b64 = Base64String::<UrlSafe>::encode(&data)?;
                     println!("{}", b64);
                 }
             }
@@ -58,8 +58,12 @@ fn baze64() -> Result<()> {
             alphabet,
         } => {
             let decoded = match alphabet {
-                cli::Alphabet::Standard => Base64String::<Standard>::from_encoded(&base64).decode(),
-                cli::Alphabet::UrlSafe => Base64String::<UrlSafe>::from_encoded(&base64).decode(),
+                cli::Alphabet::Standard => {
+                    Base64String::<Standard>::from_encoded(&base64).decode()?
+                }
+                cli::Alphabet::UrlSafe => {
+                    Base64String::<UrlSafe>::from_encoded(&base64).decode()?
+                }
             };
 
             if let Some(path) = output {
