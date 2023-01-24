@@ -77,12 +77,10 @@ impl Alphabet for Standard {
     fn decode_char(c: char) -> Result<u8, B64Error> {
         if !Self::ENCODE_MAP.contains(&c) && c != '\0' {
             Err(B64Error::InvalidChar(c))
+        } else if c == Self::PADDING {
+            Ok(0)
         } else {
-            if c == Self::PADDING {
-                Ok(0)
-            } else {
-                Ok(Self::DECODE_MAP[c as u8 as usize])
-            }
+            Ok(Self::DECODE_MAP[c as u8 as usize])
         }
     }
 }
@@ -101,16 +99,14 @@ impl Alphabet for UrlSafe {
     fn decode_char(c: char) -> Result<u8, B64Error> {
         if !Self::ENCODE_MAP.contains(&c) && c != '\0' {
             Err(B64Error::InvalidChar(c))
+        } else if c == Self::PADDING {
+            Ok(0)
+        } else if c == '-' {
+            Ok(Self::DECODE_MAP[b'+' as usize])
+        } else if c == '_' {
+            Ok(Self::DECODE_MAP[b'/' as usize])
         } else {
-            if c == Self::PADDING {
-                Ok(0)
-            } else if c == '-' {
-                Ok(Self::DECODE_MAP[b'+' as usize])
-            } else if c == '_' {
-                Ok(Self::DECODE_MAP[b'/' as usize])
-            } else {
-                Ok(Self::DECODE_MAP[c as u8 as usize])
-            }
+            Ok(Self::DECODE_MAP[c as u8 as usize])
         }
     }
 }
