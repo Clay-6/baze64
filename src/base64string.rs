@@ -17,21 +17,18 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8]) -> Result<Self, B64Error> {
-        let mut chunks = bytes.chunks_exact(3);
+        let chunks = bytes.chunks(3);
         let mut encoded = vec![];
 
-        #[allow(clippy::while_let_on_iterator)] // Ownership shenanigans necessitate this
-        while let Some(chunk) = chunks.next() {
-            encoded.push(Self::encode_triplet([chunk[0], chunk[1], chunk[2]])?)
+        for chunk in chunks {
+            match chunk.len() {
+                3 => encoded.push(Self::encode_triplet([chunk[0], chunk[1], chunk[2]])?),
+                2 => encoded.push(Self::encode_doublet([chunk[0], chunk[1]])?),
+                1 => encoded.push(Self::encode_singlet([chunk[0]])?),
+                _ => unreachable!("Mathematically impossible"),
+            }
         }
 
-        let rem = chunks.remainder();
-        match rem.len() {
-            0 => { /* Do nothing */ }
-            1 => encoded.push(Self::encode_singlet([rem[0]])?),
-            2 => encoded.push(Self::encode_doublet([rem[0], rem[1]])?),
-            _ => unreachable!("{}", rem.len()), // Mathematically impossible
-        }
         Ok(Self {
             content: encoded.iter().flatten().collect(),
             _alphabet: PhantomData,
