@@ -17,7 +17,7 @@ fn main() {
     color_eyre::install().unwrap();
 
     if let Err(e) = baze64() {
-        eprintln!("Error: {}", e)
+        eprintln!("Error: {e}")
     }
 }
 
@@ -44,11 +44,11 @@ fn baze64() -> Result<()> {
             match alphabet {
                 cli::Alphabet::Standard => {
                     let b64 = Base64String::<Standard>::encode(&data)?;
-                    println!("{}", b64);
+                    println!("{b64}");
                 }
                 cli::Alphabet::UrlSafe => {
                     let b64 = Base64String::<UrlSafe>::encode(&data)?;
-                    println!("{}", b64);
+                    println!("{b64}");
                 }
             }
         }
