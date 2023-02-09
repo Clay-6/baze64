@@ -34,6 +34,12 @@ pub enum Command {
         /// The base64 alphabet the input was encoded in
         #[clap(short, long, default_value_t = Alphabet::Standard)]
         alphabet: Alphabet,
+        /// Output the decoded data in hexadecimal form
+        #[clap(short = 'H', long)]
+        hex: bool,
+        /// Output the decoded data in byte form
+        #[clap(short, long)]
+        bytes: bool,
     },
 }
 

@@ -56,6 +56,8 @@ fn baze64() -> Result<()> {
             base64,
             output,
             alphabet,
+            hex,
+            bytes,
         } => {
             let decoded = match alphabet {
                 cli::Alphabet::Standard => {
@@ -69,6 +71,13 @@ fn baze64() -> Result<()> {
             if let Some(path) = output {
                 let mut f = File::create(path)?;
                 f.write_all(&decoded)?;
+            } else if hex {
+                print!("0x{:02X}", decoded.first().unwrap_or(&0));
+                decoded.iter().skip(1).for_each(|b| print!("{b:02X}"));
+                println!();
+            } else if bytes {
+                decoded.iter().for_each(|b| print!("{b:08b}"));
+                println!();
             } else {
                 println!("{}", String::from_utf8_lossy(&decoded))
             }
