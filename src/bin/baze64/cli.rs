@@ -55,9 +55,9 @@ impl FromStr for Alphabet {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "standard" => Ok(Self::Standard),
-            "urlsafe" | "url" => Ok(Self::UrlSafe),
+            "urlsafe" => Ok(Self::UrlSafe),
             _ => Err(eyre!(
-                "Invalid alphabet specifier, use either `standard` or `urlsafe`/`url`"
+                "Invalid alphabet specifier, use either `standard` or `urlsafe`"
             )),
         }
     }
