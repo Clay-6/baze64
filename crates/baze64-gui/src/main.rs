@@ -3,6 +3,8 @@
 use eframe::{egui, epaint::Vec2, NativeOptions};
 
 fn main() -> eframe::Result<()> {
+    tracing_subscriber::fmt::init();
+
     let options = NativeOptions {
         initial_window_size: Some(Vec2::new(320.0, 230.0)),
         ..Default::default()
