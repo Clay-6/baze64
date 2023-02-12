@@ -40,8 +40,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum B64Error {
-    #[error("Value {0} is outsite the 6-bit integer range")]
+    #[error("Value `{0}` is outsite the 6-bit integer range")]
     BitsOOB(u8),
-    #[error("Character {0} is not part of the alphabet")]
+    #[error("Invalid Base64 character `{0}`")]
     InvalidChar(char),
 }
