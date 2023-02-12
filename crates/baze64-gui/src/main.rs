@@ -29,14 +29,18 @@ impl eframe::App for App {
                 .labelled_by(input_label.id);
             ui.horizontal(|ui| {
                 if ui.button("Encode").clicked() {
-                    let encoded = Base64String::<Standard>::encode(self.input.as_bytes()).unwrap();
-                    self.output = encoded.to_string();
+                    let encoded = Base64String::<Standard>::encode(self.input.as_bytes());
+                    self.output = match encoded {
+                        Ok(t) => t.to_string(),
+                        Err(e) => format!("Error: {e}"),
+                    };
                 }
                 if ui.button("Decode").clicked() {
-                    let decoded = Base64String::<Standard>::from_encoded(&self.input)
-                        .decode()
-                        .unwrap();
-                    self.output = String::from_utf8_lossy(&decoded).to_string();
+                    let decoded = Base64String::<Standard>::from_encoded(&self.input).decode();
+                    self.output = match decoded {
+                        Ok(d) => String::from_utf8_lossy(&d).to_string(),
+                        Err(e) => format!("Error: {e}"),
+                    };
                 }
             });
             ui.heading(&self.output);
