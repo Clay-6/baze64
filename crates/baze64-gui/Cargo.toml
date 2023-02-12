@@ -9,3 +9,5 @@ repository = "https://github.com/Clay-6/baze64"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+baze64 = { path = "../baze64"}
+eframe = "0.21.1"
