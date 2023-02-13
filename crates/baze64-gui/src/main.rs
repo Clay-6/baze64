@@ -7,7 +7,7 @@ fn main() -> eframe::Result<()> {
     tracing_subscriber::fmt::init();
 
     let options = NativeOptions {
-        initial_window_size: Some(Vec2::new(320.0, 230.0)),
+        initial_window_size: Some(Vec2::new(770.0, 200.0)),
         ..Default::default()
     };
 
@@ -16,34 +16,41 @@ fn main() -> eframe::Result<()> {
 
 #[derive(Debug, Default)]
 struct App {
-    input: String,
-    output: String,
+    plaintext: String,
+    base64: String,
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Baze64");
-            let input_label = ui.label("Your input");
-            ui.text_edit_multiline(&mut self.input)
-                .labelled_by(input_label.id);
+
             ui.horizontal(|ui| {
-                if ui.button("Encode").clicked() {
-                    let encoded = Base64String::<Standard>::encode(self.input.as_bytes());
-                    self.output = match encoded {
-                        Ok(t) => t.to_string(),
-                        Err(e) => format!("Error: {e}"),
-                    };
-                }
-                if ui.button("Decode").clicked() {
-                    let decoded = Base64String::<Standard>::from_encoded(&self.input).decode();
-                    self.output = match decoded {
-                        Ok(d) => String::from_utf8_lossy(&d).to_string(),
-                        Err(e) => format!("Error: {e}"),
-                    };
-                }
+                let input_label = ui.label("Plaintext");
+                ui.text_edit_multiline(&mut self.plaintext)
+                    .labelled_by(input_label.id);
+
+                ui.vertical(|ui| {
+                    if ui.button("-> Encode").clicked() {
+                        let encoded = Base64String::<Standard>::encode(self.plaintext.as_bytes());
+                        self.base64 = match encoded {
+                            Ok(t) => t.to_string(),
+                            Err(e) => format!("Error: {e}"),
+                        };
+                    }
+                    if ui.button("Decode <-").clicked() {
+                        let decoded = Base64String::<Standard>::from_encoded(&self.base64).decode();
+                        self.plaintext = match decoded {
+                            Ok(d) => String::from_utf8_lossy(&d).to_string(),
+                            Err(e) => format!("Error: {e}"),
+                        };
+                    }
+                });
+
+                let encoded_label = ui.label("Base64");
+                ui.text_edit_multiline(&mut self.base64)
+                    .labelled_by(encoded_label.id);
             });
-            ui.heading(&self.output);
         });
     }
 }
