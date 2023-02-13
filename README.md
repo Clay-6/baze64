@@ -1,18 +1,6 @@
 # Baze64
 
-A Rust library & binary crate for encoding & decoding
-base64
-
-## Usage
-
-Run `baze64 encode <STRING>` to encode a string or `baze64 encode -f <FILE>` to
-encode a file. Decode a base64 string by running
-
-```shell
-baze64 decode <STRING>
-```
-
-where `<STRING>` is a base64 encoded string, adding `-o <FILE>` to output to `<FILE>`
+A Rust project for encoding & decoding base64 consisting of a library, CLI, & simple GUI.
 
 ## Installation
 
