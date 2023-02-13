@@ -4,11 +4,12 @@ description = "A GUI for encoding & decoding base64"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/Clay-6/baze64"
+repository = "https://github.com/Clay-6/baze64/tree/main/crates/baze64-gui"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-baze64 = { path = "../baze64"}
+baze64 = { path = "../baze64", version = "0.2.0"}
 eframe = "0.21.1"
 tracing-subscriber = "0.3.16"
