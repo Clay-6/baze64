@@ -336,7 +336,7 @@ dependencies = [
 
 [[package]]
 name = "baze64"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "bitreader",
  "clap",
@@ -347,7 +347,7 @@ dependencies = [
 
 [[package]]
 name = "baze64-gui"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "baze64",
  "eframe",
