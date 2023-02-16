@@ -2,7 +2,10 @@
 
 use core::fmt;
 
-use baze64::{alphabet::Standard, Base64String};
+use baze64::{
+    alphabet::{Standard, UrlSafe},
+    Base64String,
+};
 use eframe::{egui, epaint::Vec2, NativeOptions};
 
 fn main() -> eframe::Result<()> {
@@ -37,14 +40,34 @@ impl eframe::App for App {
 
                 ui.vertical(|ui| {
                     if ui.button("-> Encode").clicked() {
-                        let encoded = Base64String::<Standard>::encode(self.plaintext.as_bytes());
-                        self.base64 = match encoded {
-                            Ok(t) => t.to_string(),
-                            Err(e) => format!("Error: {e}"),
-                        };
+                        match self.alphabet {
+                            Alphabet::Standard => {
+                                let encoded =
+                                    Base64String::<Standard>::encode(self.plaintext.as_bytes());
+                                self.base64 = match encoded {
+                                    Ok(t) => t.to_string(),
+                                    Err(e) => format!("Error: {e}"),
+                                };
+                            }
+                            Alphabet::UrlSafe => {
+                                let encoded =
+                                    Base64String::<UrlSafe>::encode(self.plaintext.as_bytes());
+                                self.base64 = match encoded {
+                                    Ok(t) => t.to_string(),
+                                    Err(e) => format!("Error: {e}"),
+                                }
+                            }
+                        }
                     }
                     if ui.button("Decode <-").clicked() {
-                        let decoded = Base64String::<Standard>::from_encoded(&self.base64).decode();
+                        let decoded = match self.alphabet {
+                            Alphabet::Standard => {
+                                Base64String::<Standard>::from_encoded(&self.base64).decode()
+                            }
+                            Alphabet::UrlSafe => {
+                                Base64String::<UrlSafe>::from_encoded(&self.base64).decode()
+                            }
+                        };
                         self.plaintext = match decoded {
                             Ok(d) => String::from_utf8_lossy(&d).to_string(),
                             Err(e) => format!("Error: {e}"),
