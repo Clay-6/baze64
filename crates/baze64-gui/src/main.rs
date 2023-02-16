@@ -1,5 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use core::fmt;
+
 use baze64::{alphabet::Standard, Base64String};
 use eframe::{egui, epaint::Vec2, NativeOptions};
 
@@ -18,6 +20,7 @@ fn main() -> eframe::Result<()> {
 struct App {
     plaintext: String,
     base64: String,
+    alphabet: Alphabet,
 }
 
 impl eframe::App for App {
@@ -46,11 +49,39 @@ impl eframe::App for App {
                         };
                     }
                 });
+                ui.vertical(|ui| {
+                    let encoded_label = ui.label("Base64");
+                    ui.text_edit_multiline(&mut self.base64)
+                        .labelled_by(encoded_label.id);
 
-                let encoded_label = ui.label("Base64");
-                ui.text_edit_multiline(&mut self.base64)
-                    .labelled_by(encoded_label.id);
+                    egui::ComboBox::from_label("Base64 Alphabet")
+                        .selected_text(self.alphabet.to_string())
+                        .show_ui(ui, |ui| {
+                            ui.selectable_value(&mut self.alphabet, Alphabet::Standard, "Standard");
+                            ui.selectable_value(&mut self.alphabet, Alphabet::UrlSafe, "URL Safe");
+                        });
+                })
             });
         });
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+enum Alphabet {
+    #[default]
+    Standard,
+    UrlSafe,
+}
+
+impl fmt::Display for Alphabet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Standard => "Standard",
+                Self::UrlSafe => "URL Safe",
+            }
+        )
     }
 }
