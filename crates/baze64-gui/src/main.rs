@@ -29,9 +29,11 @@ impl eframe::App for App {
             ui.heading("Baze64");
 
             ui.horizontal(|ui| {
-                let input_label = ui.label("Plaintext");
-                ui.text_edit_multiline(&mut self.plaintext)
-                    .labelled_by(input_label.id);
+                ui.vertical(|ui| {
+                    let input_label = ui.label("Plaintext");
+                    ui.text_edit_multiline(&mut self.plaintext)
+                        .labelled_by(input_label.id);
+                });
 
                 ui.vertical(|ui| {
                     if ui.button("-> Encode").clicked() {
