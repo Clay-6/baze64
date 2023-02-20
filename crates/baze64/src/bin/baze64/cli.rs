@@ -23,6 +23,9 @@ pub enum Command {
         /// The base64 alphabet to encode using
         #[clap(short, long, default_value_t = Alphabet::Standard)]
         alphabet: Alphabet,
+        /// Return the encoded base64 without padding
+        #[clap(long)]
+        no_padding: bool,
     },
     /// Decode a Base64 string
     Decode {

@@ -27,6 +27,7 @@ fn baze64() -> Result<()> {
             string,
             file,
             alphabet,
+            no_padding,
         } => {
             let data = if let Some(txt) = string {
                 txt.as_bytes().to_vec()
@@ -44,11 +45,25 @@ fn baze64() -> Result<()> {
             match alphabet {
                 cli::Alphabet::Standard => {
                     let b64 = Base64String::<Standard>::encode(&data)?;
-                    println!("{b64}");
+                    println!(
+                        "{}",
+                        if !no_padding {
+                            b64.to_string()
+                        } else {
+                            b64.without_padding()
+                        }
+                    );
                 }
                 cli::Alphabet::UrlSafe => {
                     let b64 = Base64String::<UrlSafe>::encode(&data)?;
-                    println!("{b64}");
+                    println!(
+                        "{}",
+                        if !no_padding {
+                            b64.to_string()
+                        } else {
+                            b64.without_padding()
+                        }
+                    );
                 }
             }
         }
