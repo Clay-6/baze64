@@ -39,7 +39,7 @@ fn baze64() -> Result<()> {
                 buf
             } else {
                 return Err(eyre!(
-                    "Either provide a string or use `-f <FILE>` to provide a file"
+                    "Either provide a string or use `-f <FILE>` to provide a file to encode"
                 ));
             };
             match alphabet {
