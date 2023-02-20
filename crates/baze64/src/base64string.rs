@@ -1,7 +1,5 @@
 use std::marker::PhantomData;
 
-use bitreader::BitReader;
-
 use crate::{alphabet::Alphabet, B64Error};
 
 /// A string of Base64 encoded data
@@ -107,13 +105,13 @@ where
     }
 
     /// Encodes a set of 3 bytes
-    fn encode_triplet(triple: [u8; 3]) -> Result<[char; 4], B64Error> {
-        let mut reader = BitReader::new(&triple);
+    fn encode_triplet([a, b, c]: [u8; 3]) -> Result<[char; 4], B64Error> {
+        let concated = ((a as u32) << 16) | ((b as u32) << 8) | c as u32;
         // These unwraps are fine because 8*3 == 6*4
-        let first = reader.read_u8(6).unwrap();
-        let second = reader.read_u8(6).unwrap();
-        let third = reader.read_u8(6).unwrap();
-        let fourth = reader.read_u8(6).unwrap();
+        let first = ((concated >> 18) & 0b0011_1111) as u8;
+        let second = ((concated >> 12) & 0b0011_1111) as u8;
+        let third = ((concated >> 6) & 0b0011_1111) as u8;
+        let fourth = (concated & 0b0011_1111) as u8;
 
         Ok([
             A::encode_bits(first)?,
@@ -123,36 +121,18 @@ where
         ])
     }
 
-    /// Encodes a single byte & pads it
-    fn encode_singlet(rem: [u8; 1]) -> Result<[char; 4], B64Error> {
-        let mut reader = BitReader::new(&rem);
-        let six = reader.read_u8(6).unwrap();
-        let half_nib = reader.read_u8(2).unwrap();
-        let (half_nib, _) = half_nib.overflowing_shl(4);
-
-        // let padded = half_nib
-        //     .replace_bits(4..5, half_nib.extract_bits(0..1))
-        //     .replace_bits(0..3, 0);
-
-        let first = A::encode_bits(six)?;
-        let second = A::encode_bits(half_nib)?;
-
-        Ok([first, second, A::PADDING, A::PADDING])
-    }
-
     /// Encodes a set of 2 bytes & pads it
     fn encode_doublet(rem: [u8; 2]) -> Result<[char; 4], B64Error> {
-        let mut reader = BitReader::new(&rem);
-        let six1 = reader.read_u8(6).unwrap();
-        let six2 = reader.read_u8(6).unwrap();
-        let nibble = reader.read_u8(4).unwrap();
-        let (nibble, _) = nibble.overflowing_shl(2);
+        let res = Self::encode_triplet([rem[0], rem[1], 0x00])?;
 
-        let first = A::encode_bits(six1)?;
-        let second = A::encode_bits(six2)?;
-        let third = A::encode_bits(nibble)?;
+        Ok([res[0], res[1], res[2], A::PADDING])
+    }
 
-        Ok([first, second, third, A::PADDING])
+    /// Encodes a single byte & pads it
+    fn encode_singlet(rem: [u8; 1]) -> Result<[char; 4], B64Error> {
+        let res = Self::encode_triplet([rem[0], 0x00, 0x00])?;
+
+        Ok([res[0], res[1], A::PADDING, A::PADDING])
     }
 }
 
