@@ -9,7 +9,6 @@ repository = "https://github.com/Clay-6/baze64/tree/main/crates/baze64"
 license = "MIT"
 
 [dependencies]
-bitreader = "0.3.6"
 clap = { version = "4.1.1", features = ["derive"] }
 color-eyre = "0.6.2"
 thiserror = "1.0.38"
