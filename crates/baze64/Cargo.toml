@@ -2,6 +2,7 @@
 name = "baze64"
 description = "Encode & decode base64 from & to arbitrary byte sequences"
 authors = ["Clay66"]
+keywords = ["encode", "decode", "base64"]
 version = "0.3.0"
 edition = "2021"
 readme = "README.md"
