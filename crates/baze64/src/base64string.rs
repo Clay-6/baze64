@@ -21,8 +21,14 @@ where
         for chunk in chunks {
             match chunk.len() {
                 3 => encoded.push(Self::encode_triplet([chunk[0], chunk[1], chunk[2]])?),
-                2 => encoded.push(Self::encode_doublet([chunk[0], chunk[1]])?),
-                1 => encoded.push(Self::encode_singlet([chunk[0]])?),
+                2 => {
+                    let res = Self::encode_triplet([chunk[0], chunk[1], 0x00])?;
+                    encoded.push([res[0], res[1], res[2], A::PADDING])
+                }
+                1 => {
+                    let res = Self::encode_triplet([chunk[0], 0x00, 0x00])?;
+                    encoded.push([res[0], res[1], A::PADDING, A::PADDING])
+                }
                 _ => unreachable!("Mathematically impossible"),
             }
         }
@@ -119,20 +125,6 @@ where
             A::encode_bits(third)?,
             A::encode_bits(fourth)?,
         ])
-    }
-
-    /// Encodes a set of 2 bytes & pads it
-    fn encode_doublet(rem: [u8; 2]) -> Result<[char; 4], B64Error> {
-        let res = Self::encode_triplet([rem[0], rem[1], 0x00])?;
-
-        Ok([res[0], res[1], res[2], A::PADDING])
-    }
-
-    /// Encodes a single byte & pads it
-    fn encode_singlet(rem: [u8; 1]) -> Result<[char; 4], B64Error> {
-        let res = Self::encode_triplet([rem[0], 0x00, 0x00])?;
-
-        Ok([res[0], res[1], A::PADDING, A::PADDING])
     }
 }
 
