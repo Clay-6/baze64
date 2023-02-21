@@ -4,7 +4,7 @@ use crate::B64Error;
 /// to encode & decode a [`Base64String`](crate::Base64String)
 pub trait Alphabet {
     /// The padding character used for the alphabet
-    const PADDING: char;
+    const PADDING: Option<char>;
 
     /// Returns the base64 character corresponding to a set of 6
     /// bits
@@ -64,7 +64,7 @@ impl UrlSafe {
 }
 
 impl Alphabet for Standard {
-    const PADDING: char = '=';
+    const PADDING: Option<char> = Some('=');
 
     fn encode_bits(bits: u8) -> Result<char, B64Error> {
         if bits > 63 {
@@ -75,7 +75,7 @@ impl Alphabet for Standard {
     }
 
     fn decode_char(c: char) -> Result<u8, B64Error> {
-        if c == Self::PADDING {
+        if c == Self::PADDING.unwrap() {
             Ok(0)
         } else if !Self::ENCODE_MAP.contains(&c) && c != '\0' {
             Err(B64Error::InvalidChar(c))
@@ -86,7 +86,7 @@ impl Alphabet for Standard {
 }
 
 impl Alphabet for UrlSafe {
-    const PADDING: char = '=';
+    const PADDING: Option<char> = Some('=');
 
     fn encode_bits(bits: u8) -> Result<char, B64Error> {
         if bits > 63 {
@@ -97,7 +97,7 @@ impl Alphabet for UrlSafe {
     }
 
     fn decode_char(c: char) -> Result<u8, B64Error> {
-        if c == Self::PADDING {
+        if c == Self::PADDING.unwrap() {
             Ok(0)
         } else if !Self::ENCODE_MAP.contains(&c) && c != '\0' {
             Err(B64Error::InvalidChar(c))

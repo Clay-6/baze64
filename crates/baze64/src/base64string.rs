@@ -15,6 +15,8 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8]) -> Result<Self, B64Error> {
+        let padding = A::PADDING.unwrap_or_default();
+
         let chunks = bytes.chunks(3);
         let mut encoded = vec![];
 
@@ -23,11 +25,11 @@ where
                 3 => encoded.push(Self::encode_triplet([chunk[0], chunk[1], chunk[2]])?),
                 2 => {
                     let res = Self::encode_triplet([chunk[0], chunk[1], 0x00])?;
-                    encoded.push([res[0], res[1], res[2], A::PADDING])
+                    encoded.push([res[0], res[1], res[2], padding])
                 }
                 1 => {
                     let res = Self::encode_triplet([chunk[0], 0x00, 0x00])?;
-                    encoded.push([res[0], res[1], A::PADDING, A::PADDING])
+                    encoded.push([res[0], res[1], padding, padding])
                 }
                 _ => unreachable!("Mathematically impossible"),
             }
@@ -41,15 +43,16 @@ where
 
     /// Decode the contents of `self` into a byte sequence
     pub fn decode(&self) -> Result<Vec<u8>, B64Error> {
+        let padding = A::PADDING.unwrap_or_default();
         let mut decoded = vec![];
         let tmp = self.content.chars().collect::<Vec<_>>();
         let segments = tmp.chunks_exact(4);
 
         for seg in segments {
-            if seg.ends_with(&[A::PADDING, A::PADDING]) {
+            if seg.ends_with(&[padding, padding]) || seg.len() % 4 == 2 {
                 let tri = Self::decode_quad([seg[0], seg[1], 0 as char, 0 as char])?;
                 decoded.push(tri[0]);
-            } else if seg.ends_with(&[A::PADDING]) {
+            } else if seg.ends_with(&[padding]) || seg.len() % 4 == 3 {
                 let tri = Self::decode_quad([seg[0], seg[1], seg[2], 0 as char])?;
                 decoded.push(tri[0]);
                 decoded.push(tri[1]);
@@ -68,8 +71,10 @@ where
     /// Base64
     pub fn from_encoded(b64: &str) -> Self {
         let mut content = b64.to_string();
-        while content.len() % 4 != 0 {
-            content.push(A::PADDING)
+        if let Some(p) = A::PADDING {
+            while content.len() % 4 != 0 {
+                content.push(p)
+            }
         }
 
         Self {
@@ -80,7 +85,10 @@ where
 
     /// Returns the encoded string with the padding removed
     pub fn without_padding(&self) -> String {
-        self.content.chars().filter(|&c| c != A::PADDING).collect()
+        self.content
+            .chars()
+            .filter(|&c| c != A::PADDING.unwrap_or_default())
+            .collect()
     }
 
     /// Returns a new [`Base64String`] with the specified
