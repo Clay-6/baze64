@@ -54,13 +54,10 @@ where
                 decoded.push(tri[0]);
             } else if seg.ends_with(&[padding]) || seg.len() % 4 == 3 {
                 let tri = Self::decode_quad([seg[0], seg[1], seg[2], 0 as char])?;
-                decoded.push(tri[0]);
-                decoded.push(tri[1]);
+                decoded.extend_from_slice(&tri[0..2])
             } else {
                 let tri = Self::decode_quad([seg[0], seg[1], seg[2], seg[3]])?;
-                for byte in tri {
-                    decoded.push(byte)
-                }
+                decoded.extend_from_slice(&tri)
             }
         }
 
