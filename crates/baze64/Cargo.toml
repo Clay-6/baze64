@@ -6,7 +6,7 @@ keywords = ["encode", "decode", "base64"]
 version = "0.3.0"
 edition = "2021"
 readme = "README.md"
-repository = "https://github.com/Clay-6/baze64/tree/main/crates/baze64"
+repository = "https://github.com/Clay-6/baze64"
 license = "MIT"
 
 [dependencies]
