@@ -22,6 +22,13 @@ pub struct Standard {
 
 impl Standard {
     pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl Default for Standard {
+    /// Get a new [`Standard`] alphabet, using its [`Default`] impl
+    fn default() -> Self {
         Self {
             encode_map: [
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -34,7 +41,14 @@ impl Standard {
 }
 
 impl UrlSafe {
+    /// Get a new [`UrlSafe`] Alphabet, using its [`Default`] impl
     pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl Default for UrlSafe {
+    fn default() -> Self {
         Self {
             encode_map: [
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
