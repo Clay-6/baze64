@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use crate::{alphabet::Alphabet, B64Error};
 
 /// A string of Base64 encoded data
@@ -15,7 +13,7 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`]
     pub fn encode(bytes: &[u8], alphabet: A) -> Result<Self, B64Error> {
-        let padding = A::PADDING.unwrap_or_default();
+        let padding = alphabet.padding().unwrap_or_default();
 
         let chunks = bytes.chunks(3);
         let mut encoded = vec![];
@@ -46,7 +44,7 @@ where
 
     /// Decode the contents of `self` into a byte sequence
     pub fn decode(&self) -> Result<Vec<u8>, B64Error> {
-        let padding = A::PADDING.unwrap_or_default();
+        let padding = self.alphabet.padding().unwrap_or_default();
         let mut decoded = vec![];
         let tmp = self.content.chars().collect::<Vec<_>>();
         let segments = tmp.chunks_exact(4);
@@ -72,7 +70,7 @@ where
     /// Base64
     pub fn from_encoded(b64: &str, alphabet: A) -> Self {
         let mut content = b64.to_string();
-        if let Some(p) = A::PADDING {
+        if let Some(p) = alphabet.padding() {
             while content.len() % 4 != 0 {
                 content.push(p)
             }
@@ -85,7 +83,7 @@ where
     pub fn without_padding(&self) -> String {
         self.content
             .chars()
-            .filter(|&c| c != A::PADDING.unwrap_or_default())
+            .filter(|&c| c != self.alphabet.padding().unwrap_or_default())
             .collect()
     }
 

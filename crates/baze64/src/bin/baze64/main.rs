@@ -3,10 +3,7 @@ use std::{
     io::{Read, Write},
 };
 
-use baze64::{
-    alphabet::{Standard, UrlSafe},
-    Base64String,
-};
+use baze64::Base64String;
 use clap::Parser;
 use cli::{Args, Command};
 use color_eyre::{eyre::eyre, Result};
@@ -42,30 +39,16 @@ fn baze64() -> Result<()> {
                     "Either provide a string or use `-f <FILE>` to provide a file to encode"
                 ));
             };
-            match alphabet {
-                cli::Alphabet::Standard => {
-                    let b64 = Base64String::<Standard>::encode(&data)?;
-                    println!(
-                        "{}",
-                        if !no_padding {
-                            b64.to_string()
-                        } else {
-                            b64.without_padding()
-                        }
-                    );
+
+            let b64 = Base64String::encode(&data, alphabet)?;
+            println!(
+                "{}",
+                if !no_padding {
+                    b64.to_string()
+                } else {
+                    b64.without_padding()
                 }
-                cli::Alphabet::UrlSafe => {
-                    let b64 = Base64String::<UrlSafe>::encode(&data)?;
-                    println!(
-                        "{}",
-                        if !no_padding {
-                            b64.to_string()
-                        } else {
-                            b64.without_padding()
-                        }
-                    );
-                }
-            }
+            );
         }
         Command::Decode {
             base64,
@@ -74,14 +57,7 @@ fn baze64() -> Result<()> {
             hex,
             bytes,
         } => {
-            let decoded = match alphabet {
-                cli::Alphabet::Standard => {
-                    Base64String::<Standard>::from_encoded(&base64).decode()?
-                }
-                cli::Alphabet::UrlSafe => {
-                    Base64String::<UrlSafe>::from_encoded(&base64).decode()?
-                }
-            };
+            let decoded = Base64String::from_encoded(&base64, alphabet).decode()?;
 
             if let Some(path) = output {
                 let mut f = File::create(path)?;

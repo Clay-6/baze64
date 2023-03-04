@@ -10,11 +10,11 @@
 //! ```
 //! # use baze64::{Base64String, alphabet::Standard};
 //! let text = "Some text".to_string();
-//! let encoded: Base64String<Standard> = Base64String::encode(text.as_bytes());
-//! let decoded = encoded.decode();
+//! let encoded = Base64String::encode(text.as_bytes(), Standard::new())?;
+//! let decoded = encoded.decode()?;
 //!
 //! assert_eq!(text, String::from_utf8(decoded)?);
-//! # Ok::<(), std::string::FromUtf8Error>(())
+//! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
 //! Encode & decode a file:
@@ -24,11 +24,11 @@
 //! let mut file = File::open("path/to/file.ext")?;
 //! let mut buffer = Vec::new();
 //! file.read_to_end(&mut buffer)?;
-//! let encoded: Base64String<Standard> = Base64String::encode(&buffer);
-//! let bytes = encoded.decode();
+//! let encoded = Base64String::encode(&buffer, Standard::new())?;
+//! let bytes = encoded.decode()?;
 //!
 //! assert_eq!(buffer, bytes);
-//! # Ok::<(), std::io::Error>(())
+//! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
 //!
 

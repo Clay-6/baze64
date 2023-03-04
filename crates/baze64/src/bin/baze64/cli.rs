@@ -1,6 +1,7 @@
 use core::fmt;
 use std::{path::PathBuf, str::FromStr};
 
+use baze64::alphabet::{Standard, UrlSafe};
 use clap::{Parser, Subcommand};
 use color_eyre::{eyre::eyre, Report};
 
@@ -50,6 +51,29 @@ pub enum Command {
 pub enum Alphabet {
     Standard,
     UrlSafe,
+}
+
+impl baze64::alphabet::Alphabet for Alphabet {
+    fn encode_bits(&self, bits: u8) -> Result<char, baze64::B64Error> {
+        match self {
+            Alphabet::Standard => Standard::new().encode_bits(bits),
+            Alphabet::UrlSafe => UrlSafe::new().encode_bits(bits),
+        }
+    }
+
+    fn decode_char(&self, c: char) -> Result<u8, baze64::B64Error> {
+        match self {
+            Alphabet::Standard => Standard::new().decode_char(c),
+            Alphabet::UrlSafe => UrlSafe::new().decode_char(c),
+        }
+    }
+
+    fn padding(&self) -> Option<char> {
+        match self {
+            Alphabet::Standard => Standard::new().padding(),
+            Alphabet::UrlSafe => UrlSafe::new().padding(),
+        }
+    }
 }
 
 impl FromStr for Alphabet {
