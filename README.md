@@ -23,5 +23,5 @@ to install the [GUI](crates/baze64-gui/)
 
 ### Precompiled Binary
 
-Install the binary for your system from the [latest GitHub release](https://github.com/Clay-6/baze64/releases/latest)
+Download the binary for your system from the [latest GitHub release](https://github.com/Clay-6/baze64/releases/latest)
 and extract the binary to a location on your `PATH`
