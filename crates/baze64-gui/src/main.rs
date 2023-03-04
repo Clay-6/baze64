@@ -41,7 +41,7 @@ impl eframe::App for App {
                 ui.vertical(|ui| {
                     if ui.button("-> Encode").clicked() {
                         let encoded =
-                            Base64String::encode(self.plaintext.as_bytes(), self.alphabet);
+                            Base64String::encode_with(self.plaintext.as_bytes(), self.alphabet);
                         self.base64 = match encoded {
                             Ok(t) => t.to_string(),
                             Err(e) => format!("Error: {e}"),

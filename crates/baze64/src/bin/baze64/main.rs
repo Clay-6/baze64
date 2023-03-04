@@ -40,7 +40,7 @@ fn baze64() -> Result<()> {
                 ));
             };
 
-            let b64 = Base64String::encode(&data, alphabet)?;
+            let b64 = Base64String::encode_with(&data, alphabet)?;
             println!(
                 "{}",
                 if !no_padding {
