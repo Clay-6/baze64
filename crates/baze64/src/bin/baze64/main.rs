@@ -63,11 +63,11 @@ fn baze64() -> Result<()> {
                 let mut f = File::create(path)?;
                 f.write_all(&decoded)?;
             } else if hex {
-                print!("0x{:02X}", decoded.first().unwrap_or(&0));
-                decoded.iter().skip(1).for_each(|b| print!("{b:02X}"));
+                print!("0x{:0>2X}", decoded.first().unwrap_or(&0));
+                decoded.iter().skip(1).for_each(|b| print!("{b:0>2X}"));
                 println!();
             } else if bytes {
-                decoded.iter().for_each(|b| print!("{b:08b}"));
+                decoded.iter().for_each(|b| print!("{b:0>8b}"));
                 println!();
             } else {
                 println!("{}", String::from_utf8_lossy(&decoded))
