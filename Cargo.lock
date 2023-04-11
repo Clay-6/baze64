@@ -350,6 +350,7 @@ version = "0.2.0"
 dependencies = [
  "baze64",
  "eframe",
+ "tracing",
  "tracing-subscriber",
 ]
 
