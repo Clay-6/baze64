@@ -6,7 +6,9 @@ use baze64::{
     alphabet::{self, Standard, UrlSafe},
     Base64String,
 };
+
 use eframe::{egui, epaint::Vec2, NativeOptions};
+use tracing::info;
 
 fn main() -> eframe::Result<()> {
     tracing_subscriber::fmt::init();
@@ -40,6 +42,7 @@ impl eframe::App for App {
 
                 ui.vertical(|ui| {
                     if ui.button("-> Encode").clicked() {
+                        info!("Encode button clicked");
                         let encoded =
                             Base64String::encode_with(self.plaintext.as_bytes(), self.alphabet);
                         self.base64 = match encoded {
@@ -48,6 +51,8 @@ impl eframe::App for App {
                         };
                     }
                     if ui.button("Decode <-").clicked() {
+                        info!("Decode button clicked");
+
                         let decoded =
                             Base64String::from_encoded_with(&self.base64, self.alphabet).decode();
                         self.plaintext = match decoded {
