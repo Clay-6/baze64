@@ -49,7 +49,7 @@ impl eframe::App for App {
                     }
                     if ui.button("Decode <-").clicked() {
                         let decoded =
-                            Base64String::from_encoded(&self.base64, self.alphabet).decode();
+                            Base64String::from_encoded_with(&self.base64, self.alphabet).decode();
                         self.plaintext = match decoded {
                             Ok(d) => String::from_utf8_lossy(&d).to_string(),
                             Err(e) => format!("Error: {e}"),
