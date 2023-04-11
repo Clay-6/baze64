@@ -69,7 +69,7 @@ where
 
     /// Contruct a [`Base64String`] from already encoded
     /// Base64
-    pub fn from_encoded(b64: &str, alphabet: A) -> Self {
+    pub fn from_encoded_with(b64: &str, alphabet: A) -> Self {
         let mut content = b64.to_string();
         if let Some(p) = alphabet.padding() {
             while content.len() % 4 != 0 {
@@ -86,15 +86,6 @@ where
             .chars()
             .filter(|&c| c != self.alphabet.padding().unwrap_or_default())
             .collect()
-    }
-
-    /// Change a [`Base64String`] to the specified alphabet `B`,
-    /// using `B`'s [`Default`] impl as the instance to encode with
-    pub fn change_alphabet<B>(self) -> Result<Base64String<B>, B64Error>
-    where
-        B: Alphabet + Default,
-    {
-        self.change_alphabet_with(B::default())
     }
 
     /// Change a [`Base64String`] to the specified
@@ -152,6 +143,15 @@ where
     /// to encode using
     pub fn encode(bytes: &[u8]) -> Result<Self, B64Error> {
         Self::encode_with(bytes, A::default())
+    }
+
+    /// Contruct a [`Base64String`] from already encoded
+    /// Base64
+    ///
+    /// Uses `A`'s [`Default`] impl as the alphabet to encode
+    /// with
+    pub fn from_encoded(b64: &str) -> Self {
+        Self::from_encoded_with(b64, A::default())
     }
 }
 
