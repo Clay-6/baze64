@@ -7,6 +7,14 @@ pub struct Base64String<A> {
     alphabet: A,
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum DecodeToStringError {
+    #[error(transparent)]
+    Base64Error(#[from] B64Error),
+    #[error(transparent)]
+    InvalidUtf8(#[from] std::string::FromUtf8Error),
+}
+
 impl<A> Base64String<A>
 where
     A: Alphabet,
@@ -65,6 +73,12 @@ where
         }
 
         Ok(decoded)
+    }
+
+    /// Decode the contents of `self` into a [`String`]
+    pub fn decode_to_string(&self) -> Result<String, DecodeToStringError> {
+        let string = String::from_utf8(self.decode()?)?;
+        Ok(string)
     }
 
     /// Contruct a [`Base64String`] from already encoded
