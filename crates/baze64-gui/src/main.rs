@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use baze64::{alphabet::Standard, Base64String};
 use tracing::{debug, info};
 
