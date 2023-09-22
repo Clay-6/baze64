@@ -1,0 +1,28 @@
+import { LineEdit } from "std-widgets.slint";
+export component MainWindow inherits Window {
+    title: "Baze64 - Encode & Decode base64";
+    min-width: 200px;
+    min-height: 100px;
+    in-out property <string> plaintext;
+    in-out property <string> base64;
+
+    callback encode_plaintext(string);
+    callback decode_base64(string);
+
+    HorizontalLayout {
+        LineEdit {
+            placeholder-text: "Plaintext";
+            text: root.plaintext;
+            accepted(text) => {
+                root.encode-plaintext(text);
+            }
+        }
+        LineEdit {
+            placeholder-text: "Base64";
+            text: root.base64;
+            accepted(text) => {
+                root.decode-base64(text);
+            }
+        }
+    }
+}
