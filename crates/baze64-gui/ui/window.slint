@@ -46,10 +46,19 @@ export component MainWindow inherits Window {
                 }
             }
         }
-        alphabet := ComboBox { 
-            model: ["standard", "urlsafe"];
-            current-value: "standard";
+        HorizontalBox {
+            Text {
+                text: "Base64 alphabet:";
+                vertical-alignment: center;
+            }
+            alphabet := ComboBox { 
+                accessible-role: combobox;
+                accessible-label: "Base64 alphabet";
+                model: ["standard", "urlsafe"];
+                current-value: "standard";
+            }
         }
+
         Button {
             text: "Clear all";
             clicked => {
