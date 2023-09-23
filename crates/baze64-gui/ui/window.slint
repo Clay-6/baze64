@@ -1,4 +1,4 @@
-import { LineEdit , HorizontalBox, Button , VerticalBox} from "std-widgets.slint";
+import { LineEdit , HorizontalBox, Button , VerticalBox, ComboBox} from "std-widgets.slint";
 export component MainWindow inherits Window {
     title: "Baze64 - Encode & Decode base64";
     min-width: 350px;
@@ -15,6 +15,10 @@ export component MainWindow inherits Window {
         base64.text = text;
     }
 
+    public function get_current_alphabet() -> string {
+        return alphabet.current-value;
+    }
+
     VerticalBox {
         HorizontalBox {
             plaintext := LineEdit {
@@ -24,6 +28,10 @@ export component MainWindow inherits Window {
                 placeholder-text: "Base64";
             }
         }
+        alphabet := ComboBox { 
+            model: ["standard", "urlsafe"];
+            current-value: "standard";
+         }
         Button {
             text: "Clear all";
             clicked => {
