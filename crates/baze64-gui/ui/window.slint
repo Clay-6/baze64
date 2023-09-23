@@ -15,8 +15,8 @@ export component MainWindow inherits Window {
         base64.text = text;
     }
 
-    public function get_current_alphabet() -> string {
-        return alphabet.current-value;
+    public function get_current_alphabet() -> int {
+        return alphabet.current-index;
     }
 
     VerticalBox {
@@ -54,8 +54,8 @@ export component MainWindow inherits Window {
             alphabet := ComboBox { 
                 accessible-role: combobox;
                 accessible-label: "Base64 alphabet";
-                model: ["standard", "urlsafe"];
-                current-value: "standard";
+                model: ["Standard", "URL safe"];
+                current-index: 0;
             }
         }
 

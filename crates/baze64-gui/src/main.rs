@@ -17,10 +17,10 @@ fn main() {
     let mw_weak = main_window.as_weak();
     main_window.on_encode_plaintext(move |text| {
         let mw = mw_weak.unwrap();
-        let encoded = match mw.invoke_get_current_alphabet().as_str() {
-            "standard" => Base64String::encode_with(text.trim().as_bytes(), Alpha::Standard),
-            "urlsafe" => Base64String::encode_with(text.trim().as_bytes(), Alpha::UrlSafe),
-            other => panic!("How is the alphabet {other}"),
+        let encoded = match mw.invoke_get_current_alphabet() {
+            0 => Base64String::encode_with(text.trim().as_bytes(), Alpha::Standard),
+            1 => Base64String::encode_with(text.trim().as_bytes(), Alpha::UrlSafe),
+            _ => unreachable!(),
         };
         let encoded = encoded.map_or_else(
             |e| {
@@ -37,10 +37,10 @@ fn main() {
     let mw_weak = main_window.as_weak();
     main_window.on_decode_base64(move |base64| {
         let mw = mw_weak.unwrap();
-        let decoded = match mw.invoke_get_current_alphabet().as_str() {
-            "standard" => Base64String::from_encoded_with(&base64, Alpha::Standard),
-            "urlsafe" => Base64String::from_encoded_with(&base64, Alpha::UrlSafe),
-            other => panic!("How is the alphabet {other}"),
+        let decoded = match mw.invoke_get_current_alphabet() {
+            0 => Base64String::from_encoded_with(&base64, Alpha::Standard),
+            1 => Base64String::from_encoded_with(&base64, Alpha::UrlSafe),
+            _ => unreachable!(),
         }
         .decode_to_string()
         .map_or_else(
