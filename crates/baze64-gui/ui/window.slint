@@ -21,17 +21,35 @@ export component MainWindow inherits Window {
 
     VerticalBox {
         HorizontalBox {
-            plaintext := LineEdit {
-                placeholder-text: "Plaintext";
+            VerticalBox {
+                plaintext := LineEdit {
+                    placeholder-text: "Plaintext";
+                }
+                Button {
+                    text: "Copy";
+                    clicked => {
+                        plaintext.select-all();
+                        plaintext.copy();
+                    }
+                }
             }
-            base64 := LineEdit {
-                placeholder-text: "Base64";
+            VerticalBox {
+                base64 := LineEdit {
+                    placeholder-text: "Base64";
+                }
+                Button {
+                    text: "Copy";
+                    clicked => {
+                        base64.select-all();
+                        base64.copy();
+                    }
+                }
             }
         }
         alphabet := ComboBox { 
             model: ["standard", "urlsafe"];
             current-value: "standard";
-         }
+        }
         Button {
             text: "Clear all";
             clicked => {
