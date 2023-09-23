@@ -23,9 +23,15 @@ export component MainWindow inherits Window {
         HorizontalBox {
             VerticalBox {
                 plaintext := LineEdit {
+                    accessible-role: AccessibleRole.text;
+                    accessible-label: "Plaintext input";
+
                     placeholder-text: "Plaintext";
                 }
                 Button {
+                    accessible-role: button;
+                    accessible-label: "Copy plaintext";
+
                     text: "Copy";
                     clicked => {
                         plaintext.select-all();
@@ -35,9 +41,15 @@ export component MainWindow inherits Window {
             }
             VerticalBox {
                 base64 := LineEdit {
+                    accessible-role: button;
+                    accessible-label: "Base64 input";
+
                     placeholder-text: "Base64";
                 }
                 Button {
+                    accessible-role: button;
+                    accessible-label: "Copy base64 text";
+
                     text: "Copy";
                     clicked => {
                         base64.select-all();
@@ -54,12 +66,16 @@ export component MainWindow inherits Window {
             alphabet := ComboBox { 
                 accessible-role: combobox;
                 accessible-label: "Base64 alphabet";
+
                 model: ["Standard", "URL safe"];
                 current-index: 0;
             }
         }
 
         Button {
+            accessible-role: button;
+            accessible-label: "Clear all text fields";
+
             text: "Clear all";
             clicked => {
                 plaintext.text = "";
