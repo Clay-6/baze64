@@ -2,7 +2,7 @@ import { LineEdit , HorizontalBox, Button , VerticalBox, ComboBox} from "std-wid
 export component MainWindow inherits Window {
     title: "Baze64 - Encode & Decode base64";
     min-width: 350px;
-    min-height: 50px;
+    min-height: 200px;
 
     callback encode_plaintext <=> plaintext.accepted;
     callback decode_base64 <=> base64.accepted;
