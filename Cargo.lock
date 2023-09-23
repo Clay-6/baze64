@@ -427,7 +427,7 @@ dependencies = [
 
 [[package]]
 name = "baze64-gui"
-version = "0.4.0"
+version = "1.0.0"
 dependencies = [
  "baze64",
  "slint",
