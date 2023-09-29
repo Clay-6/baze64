@@ -9,6 +9,10 @@ readme = "README.md"
 repository = "https://github.com/Clay-6/baze64"
 license = "MIT"
 
+[package.metadata.wix]
+upgrade-guid = "B02D53D6-12B4-4E48-B50F-211DE9C943AC"
+path-guid = "0ED7ACA9-E51C-4105-913A-83C6052D4F48"
+
 [dependencies]
 clap = { version = "4.1.1", features = ["derive"] }
 color-eyre = "0.6.2"
