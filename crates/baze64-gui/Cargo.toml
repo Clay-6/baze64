@@ -1,11 +1,16 @@
 [package]
 name = "baze64-gui"
 description = "A GUI for encoding & decoding base64"
+authors = ["Clay66"]
 version = "2.0.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Clay-6/baze64"
 readme = "README.md"
+
+[package.metadata.wix]
+upgrade-guid = "0EB09685-B1F2-4B3C-B072-7C60915FA16B"
+path-guid = "F6A93AE7-F70F-48E5-A26F-C1EF90E0A7C3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
