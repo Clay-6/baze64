@@ -54,6 +54,13 @@ pub enum Alphabet {
 }
 
 impl baze64::alphabet::Alphabet for Alphabet {
+    fn padding(&self) -> Option<char> {
+        match self {
+            Alphabet::Standard => Standard::new().padding(),
+            Alphabet::UrlSafe => UrlSafe::new().padding(),
+        }
+    }
+
     fn encode_bits(&self, bits: u8) -> Result<char, baze64::B64Error> {
         match self {
             Alphabet::Standard => Standard::new().encode_bits(bits),
@@ -65,13 +72,6 @@ impl baze64::alphabet::Alphabet for Alphabet {
         match self {
             Alphabet::Standard => Standard::new().decode_char(c),
             Alphabet::UrlSafe => UrlSafe::new().decode_char(c),
-        }
-    }
-
-    fn padding(&self) -> Option<char> {
-        match self {
-            Alphabet::Standard => Standard::new().padding(),
-            Alphabet::UrlSafe => UrlSafe::new().padding(),
         }
     }
 }

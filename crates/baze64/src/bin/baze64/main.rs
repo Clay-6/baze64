@@ -7,6 +7,7 @@ use baze64::Base64String;
 use clap::Parser;
 use cli::{Args, Command};
 use color_eyre::{eyre::eyre, Result};
+use color_eyre::eyre::bail;
 
 mod cli;
 
@@ -35,9 +36,9 @@ fn baze64() -> Result<()> {
 
                 buf
             } else {
-                return Err(eyre!(
+                bail!(
                     "Either provide a string or use `-f <FILE>` to provide a file to encode"
-                ));
+                );
             };
 
             let b64 = Base64String::encode_with(&data, alphabet)?;
@@ -65,13 +66,12 @@ fn baze64() -> Result<()> {
             } else if hex {
                 print!("0x{:0>2X}", decoded.first().unwrap_or(&0));
                 decoded.iter().skip(1).for_each(|b| print!("{b:0>2X}"));
-                println!();
             } else if bytes {
                 decoded.iter().for_each(|b| print!("{b:0>8b}"));
-                println!();
             } else {
                 println!("{}", String::from_utf8_lossy(&decoded))
             }
+            std::io::stdout().flush()?;
         }
     }
 
