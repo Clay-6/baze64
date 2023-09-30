@@ -417,7 +417,7 @@ checksum = "9ba43ea6f343b788c8764558649e08df62f86c6ef251fdaeb1ffd010a9ae50a2"
 
 [[package]]
 name = "baze64"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "clap",
  "color-eyre",
@@ -427,7 +427,7 @@ dependencies = [
 
 [[package]]
 name = "baze64-gui"
-version = "2.0.0"
+version = "2.0.1"
 dependencies = [
  "baze64",
  "slint",
