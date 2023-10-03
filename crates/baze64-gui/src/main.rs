@@ -17,9 +17,10 @@ fn main() {
     let mw_weak = main_window.as_weak();
     main_window.on_encode_plaintext(move |text| {
         let mw = mw_weak.unwrap();
+        let text = text.trim();
         let encoded = match mw.invoke_get_current_alphabet() {
-            0 => Base64String::encode_with(text.trim().as_bytes(), Alpha::Standard),
-            1 => Base64String::encode_with(text.trim().as_bytes(), Alpha::UrlSafe),
+            0 => Base64String::encode_with(text, Alpha::Standard),
+            1 => Base64String::encode_with(text, Alpha::UrlSafe),
             _ => unreachable!(),
         };
         let encoded = encoded.map_or_else(
