@@ -6,8 +6,8 @@ use std::{
 use baze64::Base64String;
 use clap::Parser;
 use cli::{Args, Command};
-use color_eyre::{eyre::eyre, Result};
-use color_eyre::eyre::bail;
+use color_eyre::{eyre::bail, Result};
+use hex::FromHex;
 
 mod cli;
 
@@ -26,9 +26,14 @@ fn baze64() -> Result<()> {
             file,
             alphabet,
             no_padding,
+            hex,
         } => {
             let data = if let Some(txt) = string {
-                txt.as_bytes().to_vec()
+                if hex {
+                    Vec::from_hex(txt)?
+                } else {
+                    txt.as_bytes().to_vec()
+                }
             } else if let Some(path) = file {
                 let mut f = File::open(path)?;
                 let mut buf = vec![];
@@ -36,9 +41,7 @@ fn baze64() -> Result<()> {
 
                 buf
             } else {
-                bail!(
-                    "Either provide a string or use `-f <FILE>` to provide a file to encode"
-                );
+                bail!("Either provide a string or use `-f <FILE>` to provide a file to encode");
             };
 
             let b64 = Base64String::encode_with(&data, alphabet)?;

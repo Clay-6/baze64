@@ -12,6 +12,7 @@ license = "MIT"
 [dependencies]
 clap = { version = "4.1.1", features = ["derive"] }
 color-eyre = "0.6.2"
+hex = "0.4.3"
 thiserror = "1.0.38"
 
 [dev-dependencies]
