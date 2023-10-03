@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use crate::{alphabet::Alphabet, B64Error};
 
 /// A string of Base64 encoded data
@@ -8,9 +10,11 @@ pub struct Base64String<A> {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum DecodeToStringError {
+pub enum DecodeError {
     #[error(transparent)]
     Base64Error(#[from] B64Error),
+    #[error(transparent)]
+    WriteError(#[from] std::io::Error),
     #[error(transparent)]
     InvalidUtf8(#[from] std::string::FromUtf8Error),
 }
@@ -56,9 +60,19 @@ where
     }
 
     /// Decode the contents of `self` into a byte sequence
-    pub fn decode(&self) -> Result<Vec<u8>, B64Error> {
-        let padding = self.alphabet.padding().unwrap_or_default();
+    pub fn decode(&self) -> Result<Vec<u8>, DecodeError> {
         let mut decoded = vec![];
+
+        self.decode_into(&mut decoded)?;
+
+        Ok(decoded)
+    }
+
+    pub fn decode_into<O>(&self, buf: &mut O) -> Result<(), DecodeError>
+    where
+        O: Write,
+    {
+        let padding = self.alphabet.padding().unwrap_or_default();
         let tmp = self.content.chars().collect::<Vec<_>>();
         let segments = tmp.chunks_exact(4);
 
@@ -66,21 +80,21 @@ where
             if seg.ends_with(&[padding, padding]) || seg.len() % 4 == 2 {
                 let tri =
                     Self::decode_quad([seg[0], seg[1], 0 as char, 0 as char], &self.alphabet)?;
-                decoded.push(tri[0]);
+                buf.write_all(&[tri[0]])?;
             } else if seg.ends_with(&[padding]) || seg.len() % 4 == 3 {
                 let tri = Self::decode_quad([seg[0], seg[1], seg[2], 0 as char], &self.alphabet)?;
-                decoded.extend_from_slice(&tri[0..2])
+                buf.write_all(&tri[0..2])?;
             } else {
                 let tri = Self::decode_quad([seg[0], seg[1], seg[2], seg[3]], &self.alphabet)?;
-                decoded.extend_from_slice(&tri)
+                buf.write_all(&tri)?;
             }
         }
 
-        Ok(decoded)
+        Ok(())
     }
 
     /// Decode the contents of `self` into a [`String`]
-    pub fn decode_to_string(&self) -> Result<String, DecodeToStringError> {
+    pub fn decode_to_string(&self) -> Result<String, DecodeError> {
         let string = String::from_utf8(self.decode()?)?;
         Ok(string)
     }
@@ -108,13 +122,13 @@ where
 
     /// Change a [`Base64String`] to the specified
     /// alphabet `B` using the given `target_alphabet` instance of `B`
-    pub fn change_alphabet_with<B>(self, target_alphabet: B) -> Result<Base64String<B>, B64Error>
+    pub fn change_alphabet_with<B>(self, target_alphabet: B) -> Result<Base64String<B>, DecodeError>
     where
         B: Alphabet,
     {
         let inner = self.decode()?;
 
-        Base64String::encode_with(inner, target_alphabet)
+        Ok(Base64String::encode_with(inner, target_alphabet)?)
     }
 
     /// Decode a set of 4 bytes
