@@ -2,7 +2,7 @@
 name = "baze64-gui"
 description = "A GUI for encoding & decoding base64"
 authors = ["Clay66"]
-version = "2.0.1"
+version = "2.0.2"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Clay-6/baze64"
