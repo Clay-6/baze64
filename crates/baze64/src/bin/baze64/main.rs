@@ -28,8 +28,11 @@ fn baze64() -> Result<()> {
             no_padding,
             hex,
         } => {
-            let data = if let Some(txt) = string {
+            let data = if let Some(mut txt) = string {
                 if hex {
+                    if txt.len() % 2 != 0 {
+                        txt = format!("0{txt}");
+                    }
                     Vec::from_hex(txt)?
                 } else {
                     txt.as_bytes().to_vec()

@@ -27,7 +27,7 @@ pub enum Command {
         /// Return the encoded base64 without padding
         #[clap(long)]
         no_padding: bool,
-        /// Encode from a hex string
+        /// Treat the input string as a hex string
         #[clap(short = 'H', long)]
         hex: bool,
     },
