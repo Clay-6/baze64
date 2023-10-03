@@ -64,11 +64,12 @@ fn baze64() -> Result<()> {
             hex,
             bytes,
         } => {
-            let decoded = Base64String::from_encoded_with(&base64, alphabet).decode()?;
+            let decoded = Base64String::from_encoded_with(base64, alphabet).decode()?;
 
             if let Some(path) = output {
                 let mut f = File::create(path)?;
                 f.write_all(&decoded)?;
+                f.flush()?;
             } else if hex {
                 print!("0x{:0>2X}", decoded.first().unwrap_or(&0));
                 decoded.iter().skip(1).for_each(|b| print!("{b:0>2X}"));

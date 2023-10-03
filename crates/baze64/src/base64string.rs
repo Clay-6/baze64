@@ -101,7 +101,10 @@ where
 
     /// Contruct a [`Base64String`] from already encoded
     /// Base64
-    pub fn from_encoded_with(b64: &str, alphabet: A) -> Self {
+    pub fn from_encoded_with<S>(b64: S, alphabet: A) -> Self
+    where
+        S: ToString,
+    {
         let mut content = b64.to_string();
         if let Some(p) = alphabet.padding() {
             while content.len() % 4 != 0 {
@@ -185,7 +188,10 @@ where
     ///
     /// Uses `A`'s [`Default`] impl as the alphabet to encode
     /// with
-    pub fn from_encoded(b64: &str) -> Self {
+    pub fn from_encoded<S>(b64: S) -> Self
+    where
+        S: ToString,
+    {
         Self::from_encoded_with(b64, A::default())
     }
 }
