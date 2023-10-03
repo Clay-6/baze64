@@ -21,7 +21,11 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`] using a
     /// given `alphabet` instance
-    pub fn encode_with(bytes: &[u8], alphabet: A) -> Result<Self, B64Error> {
+    pub fn encode_with<B>(bytes: B, alphabet: A) -> Result<Self, B64Error>
+    where
+        B: AsRef<[u8]>,
+    {
+        let bytes = bytes.as_ref();
         let padding = alphabet.padding().unwrap_or_default();
 
         let chunks = bytes.chunks(3);
@@ -110,7 +114,7 @@ where
     {
         let inner = self.decode()?;
 
-        Base64String::encode_with(&inner, target_alphabet)
+        Base64String::encode_with(inner, target_alphabet)
     }
 
     /// Decode a set of 4 bytes
@@ -153,9 +157,12 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`]
     ///
-    /// Uses `A`'s [`Default`] implementation as the alphabet
-    /// to encode using
-    pub fn encode(bytes: &[u8]) -> Result<Self, B64Error> {
+    /// Uses `A`'s [`Default`] impl as the alphabet
+    /// to encode with
+    pub fn encode<B>(bytes: B) -> Result<Self, B64Error>
+    where
+        B: AsRef<[u8]>,
+    {
         Self::encode_with(bytes, A::default())
     }
 
@@ -211,7 +218,7 @@ mod tests {
     #[test]
     fn encode_long() {
         let input = "everybody".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(&input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
         let expected = Base64String {
             content: String::from("ZXZlcnlib2R5"),
             alphabet: Standard::new(),
@@ -223,7 +230,7 @@ mod tests {
     #[test]
     fn encode_2_rem() {
         let input = "event".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(&input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
         let expected = Base64String {
             content: String::from("ZXZlbnQ="),
             alphabet: Standard::new(),
@@ -235,7 +242,7 @@ mod tests {
     #[test]
     fn encode_1_rem() {
         let input = "even".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(&input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
         let expected = Base64String {
             content: String::from("ZXZlbg=="),
             alphabet: Standard::new(),
