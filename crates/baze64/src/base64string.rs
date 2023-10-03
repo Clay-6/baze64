@@ -194,6 +194,15 @@ where
     }
 }
 
+impl<A> AsRef<str> for Base64String<A>
+where
+    A: Alphabet,
+{
+    fn as_ref(&self) -> &str {
+        &self.content
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::alphabet::Standard;
