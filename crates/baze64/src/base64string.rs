@@ -25,6 +25,17 @@ where
 {
     /// Encode a sequence of bytes into a [`Base64String`] using a
     /// given `alphabet` instance
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::*;
+    /// # type MyAlphabet = baze64::alphabet::Standard;
+    ///
+    /// let data = "secret message".as_bytes();
+    /// let alphabet = MyAlphabet::new();
+    /// let encoded = Base64String::encode_with(&data, alphabet)?;
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn encode_with<B>(bytes: B, alphabet: A) -> Result<Self, B64Error>
     where
         B: AsRef<[u8]>,
@@ -60,6 +71,17 @@ where
     }
 
     /// Decode the contents of `self` into a byte sequence
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// let data = "Pretend this is important";
+    /// let base64 = Base64String::<Standard>::encode(data.as_bytes())?;
+    /// let decoded_bytes = base64.decode()?;
+    ///
+    /// assert_eq!(data.as_bytes(), &decoded_bytes);
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn decode(&self) -> Result<Vec<u8>, DecodeError> {
         let mut decoded = vec![];
 
@@ -68,6 +90,20 @@ where
         Ok(decoded)
     }
 
+    /// Decode the contents of `self` into the `buf` provided
+    ///
+    /// # Examples
+    /// ```no_run
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// # use std::{fs::File, io::Read};
+    ///
+    /// let data = "Definitely not contrived";
+    /// let base64 = Base64String::<Standard>::encode(data.as_bytes())?;
+    /// let mut file = File::open("some/file.txt")?;
+    /// base64.decode_into(&mut file)?;
+    ///
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn decode_into<O>(&self, buf: &mut O) -> Result<(), DecodeError>
     where
         O: Write,
@@ -94,6 +130,17 @@ where
     }
 
     /// Decode the contents of `self` into a [`String`]
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// let message = "Secret message :D";
+    /// let encoded = Base64String::<Standard>::encode(message.as_bytes())?;
+    /// let decoded = encoded.decode_to_string()?;
+    ///
+    /// assert_eq!(message, decoded.as_str());
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn decode_to_string(&self) -> Result<String, DecodeError> {
         let string = String::from_utf8(self.decode()?)?;
         Ok(string)
@@ -101,6 +148,16 @@ where
 
     /// Contruct a [`Base64String`] from already encoded
     /// Base64
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// // Pretend this does something useful
+    /// fn do_something(something_encoded: &str) {
+    ///     let base64 = Base64String::from_encoded_with(something_encoded, Standard::new());
+    ///     // Now to use the Base64String!
+    /// }
+    /// ```
     pub fn from_encoded_with<S>(b64: S, alphabet: A) -> Self
     where
         S: ToString,
@@ -116,6 +173,15 @@ where
     }
 
     /// Returns the encoded string with the padding removed
+    ///
+    /// # Example
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// let padded = Base64String::<Standard>::encode("Something important".as_bytes())?;
+    /// let unpadded = padded.without_padding();
+    ///
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn without_padding(&self) -> String {
         self.content
             .chars()
@@ -125,6 +191,17 @@ where
 
     /// Change a [`Base64String`] to the specified
     /// alphabet `B` using the given `target_alphabet` instance of `B`
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::{Standard, UrlSafe}};
+    /// let data = "Something important".as_bytes();
+    /// let standard = Base64String::<Standard>::encode(&data)?;
+    /// let url_safe = standard.change_alphabet_with(UrlSafe::new())?;
+    ///
+    /// assert_eq!(data, url_safe.decode()?);
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn change_alphabet_with<B>(self, target_alphabet: B) -> Result<Base64String<B>, DecodeError>
     where
         B: Alphabet,
@@ -176,6 +253,15 @@ where
     ///
     /// Uses `A`'s [`Default`] impl as the alphabet
     /// to encode with
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    ///
+    /// let data = "secret message".as_bytes();
+    /// let encoded = Base64String::<Standard>::encode(data)?;
+    /// # Ok::<(), Box<dyn std::error::Error>>(())
+    /// ```
     pub fn encode<B>(bytes: B) -> Result<Self, B64Error>
     where
         B: AsRef<[u8]>,
@@ -188,6 +274,16 @@ where
     ///
     /// Uses `A`'s [`Default`] impl as the alphabet to encode
     /// with
+    ///
+    /// # Examples
+    /// ```
+    /// # use baze64::{Base64String, alphabet::Standard};
+    /// // Pretend this does something useful
+    /// fn do_something(something_encoded: &str) {
+    ///     let base64 = Base64String::<Standard>::from_encoded(something_encoded);
+    ///     // Now to use the Base64String!
+    /// }
+    /// ```
     pub fn from_encoded<S>(b64: S) -> Self
     where
         S: ToString,
