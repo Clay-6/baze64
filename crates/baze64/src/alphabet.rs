@@ -8,8 +8,16 @@ pub trait Alphabet {
 
     /// Returns the base64 character corresponding to a set of 6
     /// bits
+    ///
+    /// [`Base64String`](crate::Base64String) makes sure to never
+    /// call this with an out-of-range value, but this method
+    /// should still handle it gracefully in case that does happen
     fn encode_bits(&self, bits: u8) -> Result<char, B64Error>;
-    /// Decodes a base64 character into it's decoded bytes
+
+    /// Decodes a base64 character into it's decoded value
+    /// The returned value must fit in a 6-bit number,
+    /// as [`Base64String`](crate::Base64String) will assume
+    /// that this happens
     fn decode_char(&self, c: char) -> Result<u8, B64Error>;
 }
 
