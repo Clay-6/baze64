@@ -11,8 +11,6 @@ pub trait Alphabet {
     fn encode_bits(&self, bits: u8) -> Result<char, B64Error>;
     /// Decodes a base64 character into it's decoded bytes
     fn decode_char(&self, c: char) -> Result<u8, B64Error>;
-    /// Returns whether or not a given character is valid for this alphabet
-    fn is_valid(&self, c: char) -> bool;
 }
 
 /// The standard base64 alphabet as defined in
@@ -94,10 +92,6 @@ impl Alphabet for Standard {
                 .map_or_else(|| Err(B64Error::InvalidChar(c)), |i| Ok(i as u8))
         }
     }
-
-    fn is_valid(&self, c: char) -> bool {
-        self.encode_map.contains(&c)
-    }
 }
 
 impl Alphabet for UrlSafe {
@@ -124,9 +118,5 @@ impl Alphabet for UrlSafe {
                 .position(|&ch| ch == c)
                 .map_or_else(|| Err(B64Error::InvalidChar(c)), |i| Ok(i as u8))
         }
-    }
-
-    fn is_valid(&self, c: char) -> bool {
-        self.encode_map.contains(&c)
     }
 }

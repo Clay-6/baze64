@@ -77,13 +77,6 @@ impl baze64::alphabet::Alphabet for Alphabet {
             Alphabet::UrlSafe => UrlSafe::new().decode_char(c),
         }
     }
-
-    fn is_valid(&self, c: char) -> bool {
-        match self {
-            Alphabet::Standard => Standard::new().is_valid(c),
-            Alphabet::UrlSafe => UrlSafe::new().is_valid(c),
-        }
-    }
 }
 
 impl FromStr for Alphabet {
