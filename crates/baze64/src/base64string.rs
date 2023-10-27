@@ -33,10 +33,10 @@ where
     ///
     /// let data = "secret message".as_bytes();
     /// let alphabet = MyAlphabet::new();
-    /// let encoded = Base64String::encode_with(&data, alphabet)?;
+    /// let encoded = Base64String::encode_with(&data, alphabet);
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
-    pub fn encode_with<B>(bytes: B, alphabet: A) -> Result<Self, B64Error>
+    pub fn encode_with<B>(bytes: B, alphabet: A) -> Self
     where
         B: AsRef<[u8]>,
     {
@@ -51,23 +51,23 @@ where
                 3 => encoded.push(Self::encode_triplet(
                     [chunk[0], chunk[1], chunk[2]],
                     &alphabet,
-                )?),
+                )),
                 2 => {
-                    let res = Self::encode_triplet([chunk[0], chunk[1], 0x00], &alphabet)?;
+                    let res = Self::encode_triplet([chunk[0], chunk[1], 0x00], &alphabet);
                     encoded.push([res[0], res[1], res[2], padding])
                 }
                 1 => {
-                    let res = Self::encode_triplet([chunk[0], 0x00, 0x00], &alphabet)?;
+                    let res = Self::encode_triplet([chunk[0], 0x00, 0x00], &alphabet);
                     encoded.push([res[0], res[1], padding, padding])
                 }
                 _ => unreachable!("Mathematically impossible"),
             }
         }
 
-        Ok(Self {
+        Self {
             content: encoded.iter().flatten().collect(),
             alphabet,
-        })
+        }
     }
 
     /// Decode the contents of `self` into a byte sequence
@@ -76,7 +76,7 @@ where
     /// ```
     /// # use baze64::{Base64String, alphabet::Standard};
     /// let data = "Pretend this is important";
-    /// let base64 = Base64String::<Standard>::encode(data.as_bytes())?;
+    /// let base64 = Base64String::<Standard>::encode(data.as_bytes());
     /// let decoded_bytes = base64.decode()?;
     ///
     /// assert_eq!(data.as_bytes(), &decoded_bytes);
@@ -98,7 +98,7 @@ where
     /// # use std::{fs::File, io::Read};
     ///
     /// let data = "Definitely not contrived";
-    /// let base64 = Base64String::<Standard>::encode(data.as_bytes())?;
+    /// let base64 = Base64String::<Standard>::encode(data.as_bytes());
     /// let mut file = File::open("some/file.txt")?;
     /// base64.decode_into(&mut file)?;
     ///
@@ -135,7 +135,7 @@ where
     /// ```
     /// # use baze64::{Base64String, alphabet::Standard};
     /// let message = "Secret message :D";
-    /// let encoded = Base64String::<Standard>::encode(message.as_bytes())?;
+    /// let encoded = Base64String::<Standard>::encode(message.as_bytes());
     /// let decoded = encoded.decode_to_string()?;
     ///
     /// assert_eq!(message, decoded.as_str());
@@ -177,7 +177,7 @@ where
     /// # Example
     /// ```
     /// # use baze64::{Base64String, alphabet::Standard};
-    /// let padded = Base64String::<Standard>::encode("Something important".as_bytes())?;
+    /// let padded = Base64String::<Standard>::encode("Something important".as_bytes());
     /// let unpadded = padded.without_padding();
     ///
     /// # Ok::<(), Box<dyn std::error::Error>>(())
@@ -196,7 +196,7 @@ where
     /// ```
     /// # use baze64::{Base64String, alphabet::{Standard, UrlSafe}};
     /// let data = "Something important".as_bytes();
-    /// let standard = Base64String::<Standard>::encode(&data)?;
+    /// let standard = Base64String::<Standard>::encode(&data);
     /// let url_safe = standard.change_alphabet_with(UrlSafe::new())?;
     ///
     /// assert_eq!(data, url_safe.decode()?);
@@ -208,7 +208,7 @@ where
     {
         let inner = self.decode()?;
 
-        Ok(Base64String::encode_with(inner, target_alphabet)?)
+        Ok(Base64String::encode_with(inner, target_alphabet))
     }
 
     /// Decode a set of 4 bytes
@@ -228,7 +228,7 @@ where
     }
 
     /// Encodes a set of 3 bytes
-    fn encode_triplet([a, b, c]: [u8; 3], alphabet: &A) -> Result<[char; 4], B64Error> {
+    fn encode_triplet([a, b, c]: [u8; 3], alphabet: &A) -> [char; 4] {
         let concated = ((a as u32) << 16) | ((b as u32) << 8) | c as u32;
         // These unwraps are fine because 8*3 == 6*4
         let first = ((concated >> 18) & 0b0011_1111) as u8;
@@ -236,12 +236,12 @@ where
         let third = ((concated >> 6) & 0b0011_1111) as u8;
         let fourth = (concated & 0b0011_1111) as u8;
 
-        Ok([
-            alphabet.encode_bits(first)?,
-            alphabet.encode_bits(second)?,
-            alphabet.encode_bits(third)?,
-            alphabet.encode_bits(fourth)?,
-        ])
+        [
+            alphabet.encode_bits(first).unwrap(),
+            alphabet.encode_bits(second).unwrap(),
+            alphabet.encode_bits(third).unwrap(),
+            alphabet.encode_bits(fourth).unwrap(),
+        ]
     }
 }
 
@@ -259,10 +259,10 @@ where
     /// # use baze64::{Base64String, alphabet::Standard};
     ///
     /// let data = "secret message".as_bytes();
-    /// let encoded = Base64String::<Standard>::encode(data)?;
+    /// let encoded = Base64String::<Standard>::encode(data);
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
-    pub fn encode<B>(bytes: B) -> Result<Self, B64Error>
+    pub fn encode<B>(bytes: B) -> Self
     where
         B: AsRef<[u8]>,
     {
@@ -334,8 +334,7 @@ mod tests {
         let encoded = Base64String::<Standard>::encode_triplet(
             [triplet[0] as u8, triplet[1] as u8, triplet[2] as u8],
             &Standard::new(),
-        )
-        .unwrap();
+        );
 
         assert_eq!(encoded, expected_encoded);
     }
@@ -343,7 +342,7 @@ mod tests {
     #[test]
     fn encode_long() {
         let input = "everybody".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlcnlib2R5"),
             alphabet: Standard::new(),
@@ -355,7 +354,7 @@ mod tests {
     #[test]
     fn encode_2_rem() {
         let input = "event".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlbnQ="),
             alphabet: Standard::new(),
@@ -367,7 +366,7 @@ mod tests {
     #[test]
     fn encode_1_rem() {
         let input = "even".chars().map(|c| c as u8);
-        let b64 = Base64String::encode(input.collect::<Vec<_>>()).unwrap();
+        let b64 = Base64String::encode(input.collect::<Vec<_>>());
         let expected = Base64String {
             content: String::from("ZXZlbg=="),
             alphabet: Standard::new(),

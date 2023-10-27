@@ -47,7 +47,7 @@ fn baze64() -> Result<()> {
                 bail!("Either provide a string or use `-f <FILE>` to provide a file to encode");
             };
 
-            let b64 = Base64String::encode_with(data, alphabet)?;
+            let b64 = Base64String::encode_with(data, alphabet);
             println!(
                 "{}",
                 if !no_padding {
