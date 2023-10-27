@@ -158,18 +158,22 @@ where
     ///     // Now to use the Base64String!
     /// }
     /// ```
-    pub fn from_encoded_with<S>(b64: S, alphabet: A) -> Self
+    pub fn from_encoded_with<S>(b64: S, alphabet: A) -> Result<Self, B64Error>
     where
         S: ToString,
     {
         let mut content = b64.to_string();
+        if let Some(c) = content.chars().find(|&c| alphabet.decode_char(c).is_err()) {
+            return Err(B64Error::InvalidChar(c));
+        }
+
         if let Some(p) = alphabet.padding() {
             while content.len() % 4 != 0 {
                 content.push(p)
             }
         }
 
-        Self { content, alphabet }
+        Ok(Self { content, alphabet })
     }
 
     /// Returns the encoded string with the padding removed
@@ -284,7 +288,7 @@ where
     ///     // Now to use the Base64String!
     /// }
     /// ```
-    pub fn from_encoded<S>(b64: S) -> Self
+    pub fn from_encoded<S>(b64: S) -> Result<Self, B64Error>
     where
         S: ToString,
     {

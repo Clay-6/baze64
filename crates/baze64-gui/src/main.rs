@@ -86,11 +86,4 @@ impl Alphabet for Alpha {
             Alpha::UrlSafe => UrlSafe::new().decode_char(c),
         }
     }
-
-    fn is_valid(&self, c: char) -> bool {
-        match self {
-            Alpha::Standard => Standard::new().is_valid(c),
-            Alpha::UrlSafe => UrlSafe::new().is_valid(c),
-        }
-    }
 }

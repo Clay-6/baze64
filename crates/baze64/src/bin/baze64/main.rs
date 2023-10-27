@@ -64,7 +64,7 @@ fn baze64() -> Result<()> {
             hex,
             bytes,
         } => {
-            let decoded = Base64String::from_encoded_with(base64, alphabet).decode()?;
+            let decoded = Base64String::from_encoded_with(base64, alphabet)?.decode()?;
 
             if let Some(path) = output {
                 let mut f = File::create(path)?;
