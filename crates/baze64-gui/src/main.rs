@@ -23,13 +23,7 @@ fn main() {
             1 => Base64String::encode_with(text, Alpha::UrlSafe),
             _ => unreachable!(),
         };
-        let encoded = encoded.map_or_else(
-            |e| {
-                error!(?e);
-                "[Error encoding text]".to_string()
-            },
-            |s| s.to_string(),
-        );
+        let encoded = encoded.to_string();
         info!(?text, ?encoded, "encoded plaintext");
         mw.invoke_set_base64(encoded.into());
         info!("set base64 text field");
@@ -43,13 +37,20 @@ fn main() {
             1 => Base64String::from_encoded_with(&base64, Alpha::UrlSafe),
             _ => unreachable!(),
         }
-        .decode_to_string()
         .map_or_else(
             |e| {
                 error!(?e);
-                "[Error decoding]".to_string()
+                "[Invalid base64 input]".to_string()
             },
-            |s| s.to_string(),
+            |b64| {
+                b64.decode_to_string().map_or_else(
+                    |e| {
+                        error!(?e);
+                        "[Error decoding]".to_string()
+                    },
+                    |s| s.to_string(),
+                )
+            },
         );
         info!(?base64, ?decoded, "decoded base64");
         mw.invoke_set_plaintext(decoded.into());
@@ -83,6 +84,13 @@ impl Alphabet for Alpha {
         match self {
             Alpha::Standard => Standard::new().decode_char(c),
             Alpha::UrlSafe => UrlSafe::new().decode_char(c),
+        }
+    }
+
+    fn is_valid(&self, c: char) -> bool {
+        match self {
+            Alpha::Standard => Standard::new().is_valid(c),
+            Alpha::UrlSafe => UrlSafe::new().is_valid(c),
         }
     }
 }
