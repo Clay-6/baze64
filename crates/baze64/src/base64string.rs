@@ -414,4 +414,103 @@ mod tests {
 
         assert_eq!(decoded, expected)
     }
+
+    #[test]
+    fn encode_test_vectors() {
+        assert_eq!(
+            Base64String::<Standard>::encode(b"").to_string(),
+            "".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"f").to_string(),
+            "Zg==".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"fo").to_string(),
+            "Zm8=".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"foo").to_string(),
+            "Zm9v".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"foob").to_string(),
+            "Zm9vYg==".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"fooba").to_string(),
+            "Zm9vYmE=".to_string()
+        );
+        assert_eq!(
+            Base64String::<Standard>::encode(b"foobar").to_string(),
+            "Zm9vYmFy".to_string()
+        );
+    }
+
+    #[test]
+    fn decode_test_vectors() {
+        assert_eq!(
+            Base64String {
+                content: "".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b""
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zg==".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"f"
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zm8=".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"fo"
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zm9v".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"foo"
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zm9vYg==".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"foob"
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zm9vYmE=".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"fooba"
+        );
+        assert_eq!(
+            Base64String {
+                content: "Zm9vYmFy".into(),
+                alphabet: Standard::new()
+            }
+            .decode()
+            .unwrap(),
+            b"foobar"
+        );
+    }
 }
