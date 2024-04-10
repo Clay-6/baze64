@@ -36,7 +36,7 @@ pub mod alphabet;
 mod base64string;
 
 pub use alphabet::{Standard, UrlSafe};
-pub use base64string::Base64String;
+pub use base64string::{Base64String, DecodeError};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
