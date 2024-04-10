@@ -1,5 +1,48 @@
 import { LineEdit, HorizontalBox, Button , VerticalBox, ComboBox } from "std-widgets.slint";
 
+component ErrorPopup {
+    in property<string> err_text;
+
+    public function show() {
+        pw.show();
+    }
+
+    pw := PopupWindow {
+        width: parent.width;
+        height: parent.height;
+
+        close-on-click: false;
+
+        Rectangle {
+            width: 100%;
+            height: 100%;
+            background: red;
+        }
+
+        VerticalBox {
+            Text {
+                text: "An error has occurred!";
+                horizontal-alignment: center;
+            }
+
+            Text {
+                text: err_text;
+                horizontal-alignment: center;
+                wrap: word-wrap;
+            }
+
+            Button {
+                accessible-role: button;
+                accessible-label: "Close error popup";
+
+                text: "Ok";
+                clicked => { pw.close(); }
+            }
+        }
+    }
+}
+
+
 export component MainWindow inherits Window {
     title: "Baze64 - Encode & Decode base64";
     min-width: 350px;
@@ -20,7 +63,16 @@ export component MainWindow inherits Window {
         return alphabet.current-index;
     }
 
+    public function show_error(err: string) {
+        error-popup.err_text = err;
+        error-popup.show()
+    }
+
     VerticalBox {
+        error-popup := ErrorPopup {
+            err_text: "Error";
+        }
+
         HorizontalBox {
             VerticalBox {
                 plaintext := LineEdit {

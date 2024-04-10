@@ -40,13 +40,19 @@ fn main() {
         .map_or_else(
             |e| {
                 error!(?e);
-                "[Invalid base64 input]".to_string()
+                mw.invoke_show_error(e.to_string().into());
+                "".to_string()
             },
             |b64| {
                 b64.decode_to_string().map_or_else(
                     |e| {
                         error!(?e);
-                        "[Error decoding]".to_string()
+                        if let baze64::DecodeError::InvalidUtf8(_) = e {
+                            mw.invoke_show_error("Invalid UTF-8 text ".into());
+                        } else {
+                            mw.invoke_show_error(e.to_string().into());
+                        }
+                        "".to_string()
                     },
                     |s| s.to_string(),
                 )
