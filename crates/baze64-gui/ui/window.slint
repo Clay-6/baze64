@@ -1,4 +1,5 @@
-import { LineEdit , HorizontalBox, Button , VerticalBox, ComboBox} from "std-widgets.slint";
+import { LineEdit, HorizontalBox, Button , VerticalBox, ComboBox } from "std-widgets.slint";
+
 export component MainWindow inherits Window {
     title: "Baze64 - Encode & Decode base64";
     min-width: 350px;
@@ -23,7 +24,7 @@ export component MainWindow inherits Window {
         HorizontalBox {
             VerticalBox {
                 plaintext := LineEdit {
-                    accessible-role: AccessibleRole.text;
+                    accessible-role: text;
                     accessible-label: "Plaintext input";
 
                     placeholder-text: "Plaintext";
